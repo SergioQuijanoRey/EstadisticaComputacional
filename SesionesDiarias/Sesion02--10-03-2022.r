@@ -80,22 +80,32 @@ message("")
 
 message("EJERCICIO 2")
 message("================================================================================")
+message("")
 
 # Ejecuta las siguientes sentencias en R y formula los sistemas se resuelven en cada caso:
 
 # Sistema 1
 # Da como resultado el vector [1]
 # Esto era de esperar porque estamos plantenando la ecuacion 2x = 2
-solve(2,2)
+message("El resultado de solve(2, 2) es:")
+print(solve(2, 2))
+message("Estamos resolviendo la ecuacion 2x = 2")
+message("")
 
 # Sistema 2
 # En este caso da [-4, 6]
 # Estamos resolviendo el sistema
 # 3x + y = 12
 # 4x + 2y = 8
-A<-matrix(c(3,1,4,2),2,2)
-b<-c(12,8)
-solve(A,b)
+message("Ahora resolvemos el sistema de ecuaciones:")
+message("")
+message("\t3x + y = 12")
+message("\t4x + 2y = 8")
+message("El resultado de este sistema de ecuaciones es: ")
+A<-matrix(c(3, 1, 4, 2), 2, 2)
+b<-c(12, 8)
+print(solve(A, b))
+message("")
 
 # Sistema 3
 # En este caso da la matriz
@@ -104,10 +114,24 @@ solve(A,b)
 #
 # Estamos resolviendo el sistema AX = Diagonal(2)
 # donde Diagonal(2) = [1 0 ; 0 1]
-solve(A,diag(2))
+message("Ahora resolvemos el sistem AX = Diag(2)")
+message("El resultado es:")
+print(solve(A, diag(2)))
+message("")
 
 # Ejercicio 2.1
 #===================================================================================================
+message("EJERCICIO 2.1")
+message("================================================================================")
+message("")
+
+message("Estamos resolviendo el sistema:")
+message("")
+message("\t10x + 7y + 8z + 7w = 32")
+message("\t7x + 5y + 6z + 5w = 23")
+message("\t8x + 6y + 10z + 9w = 33")
+message("\t7x + 5y + 9z + 10w = 31")
+message("")
 
 # Creamos la matriz de coeficientes
 # Por comodidad lo hago creando el vector y luego asignando dimensiones
@@ -125,21 +149,37 @@ b <- c(32, 23, 33, 31)
 # Resuelvo el sistema con solve
 # El resultado es [1, 1, 1, 1]
 result <- solve(A, b)
-cat("El resultado es ", result, "\n")
+message("El resultado de dicho sistema de ecuaciones es:")
+print(result)
+message("")
 
 # Perturbo los terminos independientes sumando 0.05
 b_pert <- b + 0.05
+message("Perturbamos ligeramente los terminos independientes")
+cat("Ahora dichos terminos independientes son: ", b_pert, "\n")
+message("")
 
 # Resuelvo el sistema perturbado
 # El resultado da [0.40 2.00 0.75 1.15]
 # Se aleja demasiado de la solucion inicial, parece muy inestable
 result <- solve(A, b_pert)
+message("El resultado a ese sistema perturbado es:")
+print(result)
+message("")
 
 # Repetimos el proceso con una perturbacion de 0.1
 # El resultado es [-0.2  3.0  0.5  1.3]
 # De nuevo, muy alejado del resultado inicial, teniendo en cuenta la magnitud de la perturbacion
 b_pert <- b + 0.1
 result <- solve(A, b_pert)
+
+message("Perturbamos de nuevo los terminos independientes")
+cat("Ahora dichos terminos independientes son: ", b_pert, "\n")
+message("")
+message("El resultado a ese sistema perturbado es:")
+print(result)
+message("")
+
 
 # Calcula el número de condición de la matriz A del sistema anterior así como su recíproco.
 # Realiza primero el cálculo con las funciones kappa y rcond y después comprueba que
@@ -153,6 +193,11 @@ kappa_A <- kappa(A)
 
 # El valor es 0.0002228164
 rcond_A <- rcond(A)
+
+message("Los valores de condicion computados usando R son:")
+message("kappa: ", kappa_A)
+message("rcond: ", rcond_A)
+message("")
 
 # Al tener un alto valor de kappa (y por tanto, un valor reciproco muy cercano a cero)
 # podemos concluir que el sistema esta bastante mal condicionado
@@ -185,6 +230,16 @@ manually_computed_rec <- 1.0 / manually_computed_kappa
 # Volvemos a explorar el cociente
 # Da 0.6649048, la diferencia es significativa
 R_vs_manually_rec <- rcond_A / manually_computed_rec
+
+message("Valores de condicion computados manualmente usando los eigenvalues:")
+message("kappa: ", manually_computed_kappa)
+message("rcond: ", manually_computed_rec)
+message("")
+
+message("Cocientes R / Manual")
+message("kappa: ", R_vs_manually_q)
+message("rcond: ", R_vs_manually_rec)
+message("")
 
 # Ejercicio 3
 #===================================================================================================
