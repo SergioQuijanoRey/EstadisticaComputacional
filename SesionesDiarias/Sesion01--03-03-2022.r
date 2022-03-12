@@ -1,6 +1,11 @@
 # Sesion 3 Marzo 2022
 # Sergio Quijano Rey
 # sergioquijano@correo.ugr.es
+#
+# NOTA: como estamos mostrando mensajes por pantalla, lo recomendable es ejecutar o bien el script
+# por lineas en un REPL o bien ejecutar todo el script usando `R --no-echo -f Sesion01-03-03-2022.r`
+# para evitar que se muestren por pantalla tambien las lineas de codigo, haciendo que los mensajes
+# por pantalla sean ilegibles
 
 # Ejercicio 1
 message("EJERCICIO 1")
@@ -90,9 +95,9 @@ message("")
 # [−2, 2] con incremento 0.1:
 
 # Creo el conjunto de valores de la x sobre la que evaluamos la funcion
-message("Creamos el vector pedido en el enunciado")
+message("Creamos el vector de valores del eje x")
 x <- seq(-2, 2, by = 0.1)
-message("El conjunto de valores de x es ", x)
+cat("El conjunto de valores de x es ", x, "\n")
 message("")
 
 # Evaluo la funcion por trozos usando mascaras logicas para anular ciertos trozos
@@ -103,6 +108,7 @@ y <-
     (x >= 0 & x < 1)*(log(x*x + 1)) +
     (x >= 2)*(2)
 cat("El conjunto de valores de la imagen es ", y, "\n")
+message("")
 
 # Ejercicio 3
 message("")
@@ -114,9 +120,11 @@ message("")
 # uniforme en el intervalo unidad usando la función runif (previamente ja la semilla
 # de generación de números aleatorios escribiendo la sentencia set.seed(1)). A partir
 # de dicho vector realiza las siguientes tareas:
+message("Creamos el vector con los 50 valores aleatorios en el intervalo unidad")
 set.seed(1)
 x <- runif(50)
 cat("Los 50 valores aleatorios son:\n", x, "\n")
+message("")
 
 # a) Calcula cuántos de sus elementos están en el intervalo (0.25, 0.75).
 message("a)")
@@ -126,17 +134,21 @@ elements_in_interval = x[x>= 0.25 & x <= 0.75]
 
 # Cuento cuantos elementos tiene dicho vector
 n_elements_in_interval <- length(elements_in_interval)
-cat("Hay ", n_elements_in_interval, " en el intervalo 0.25 0.75\n")
+message("Hay ", n_elements_in_interval, " en el intervalo 0.25 0.75")
+message("")
 
 # b) Calcula cuántos de sus elementos están por debajo de 0.1 o por encima de 0.9.
 # Reemplaza dichos elementos por el valor NA. Después calcula su media.
+message("b)")
 
 # En el vector y guardo los elementos que cumplen la condicion del enunciado
 y <- x[x <= 0.1 | x >= 0.9]
 
 # Calculo el numero de elementos
 n_y <- length(y)
-cat("El numero de elementos cumpliendo las condiciones del enunciado son ", n_y, "\n")
+message("El numero de elementos cumpliendo las condiciones del enunciado son ", n_y)
+message("Dichas condiciones son estar por debajo de 0.1 o por encima de 0.9")
+message("")
 
 # Remplazo estos valores por NA
 # Para ello, calculo las posiciones de x que lo cumplen y los uso como mascara
@@ -145,23 +157,30 @@ positions <- which(x <= 0.1 | x >= 0.9)
 # Uso las posiciones para remplazar por NA
 x[positions] <- NA
 
+message("Remplazo dichas posiciones por NA")
 cat("Despues de reemplazar las posiciones, el vector queda:\n", x, "\n")
+message("")
 
 # Ahora calculamos la media ignorando los NA
 mx <- mean(x, na.rm = TRUE)
-cat("La media del vector x ahora es ", mx, "\n")
+message("La media del vector x ahora es ", mx)
+message("")
 
 # c) Partiendo del vector obtenido en el apartado anterior, reemplaza los valores NA
 # por ceros. Después calcula su media y compara con la obtenida en el apartado
 # anterior
+message("c)")
 
 # Calculo las posiciones que son NA (aunque es el vector ya calculado positions)
 # y reemplazo dichas posiciones por 0
+message("Sustituimos los NA del vector por 0")
 positions <- which(is.na(x))
 x[positions] <- 0
 cat("Ahora el vector de X es ", x, "\n")
+message("")
 
 # Calculo la media
+message("Calculamos la media del vector remplazado")
 mx <- mean(x)
 cat("Ahora la media de x es", mx, "\n")
-cat("Como era de esperar, ahora la media es menor al no estar ignorando los NA y estar usando el valor mas bajo del rango (0)\n")
+message("Como era de esperar, ahora la media es menor al no estar ignorando los NA y estar usando el valor mas bajo del rango (0)")
