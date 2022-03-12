@@ -3,81 +3,97 @@
 # sergioquijano@correo.ugr.es
 
 # Ejercicio 1
-print("EJERCICIO 1")
-print("================================================================================")
-print("")
+message("EJERCICIO 1")
+message("================================================================================")
+message("")
 
 # Crea un vector con nombre x que contenga una secuencia de números reales entre 1
 # y 10 con incrementos de 0.2. Con dicho vector realiza las siguientes tareas:
+message("Creamos el vector pedido en el enunciado")
 x <- seq(1, 10, by = 0.2)
-print("El vector creado es", x)
+message("El vector creado es: ", x)
+message("")
 
 # a) Calcula su longitud y almacénala en un objeto con nombre n
-print("a)")
+message("a)")
 n <- length(x)
-print(n)
+message("El tamaño del vector x es: ", n)
+message("")
 
 # b) Da nombres a cada uno de los elementos del vector del tipo x_1,...,x_n
 
 # Uso paste para concatenar al caracter "x" todas las posiciones hasta la n, que he calculado
 # en el apartado anterior
-print("b)")
+message("b)")
 nombres <- paste("x", 1:n, sep = "_")
 names(x) <- nombres
-print(nombres)
+message("Los nombres dados al vector son: ")
+cat(nombres, "\n")
+message("")
 
 # c) Calcula la media de x y almacénala en un objeto con nombre mx.
 # Uso la sentencia simple porque no tenemos valores especiales NA NAN en el vector
-print("c)")
+message("c)")
 mx <- mean(x)
-print(mx)
+message("La media del vector es: ", mx)
+message("")
 
 # d) Calcula cuántos elementos de x están por encima de mx.
-print("d)")
+message("d)")
 # Uso una mascara logica para calcular el vector de los elementos por encima de mx, y luego
 # calculo la media de ese vector filtrado
 filtered_x <- x[x > mx]
 elements_greater_than_mean <- length(filtered_x)
-print(elements_greater_than_mean)
+message("El numero de elementos por encima de la media (", mx, ") son: ", elements_greater_than_mean)
+message("")
 
 # e) Calcula la posición que ocupa el elemento de x más próximo por encima de mx.
 
-print("e)")
+message("e)")
 # Calculo las posiciones de elementos por encima de la media
 posiciones <- which(x > mx)
-print(posiciones)
+cat("Las posiciones de elementos que estan por encima de la media son: ", posiciones, "\n")
 
 # Tomo el minimo de esa lista de posiciones, que es la asociada al primer elemento que supera
 # la media
 first_greater_than_mx <- min(posiciones)
-print(first_greater_than_mx)
+message("La posicion del elemento mas proximo a la media, pero por encima de ella, es: ", first_greater_than_mx)
+message("")
+message("Nos hemos aprovechado de que los elementos estan ordenados de menor a mayor en el vector")
+message("Asi que lo unico que habia que hacer era tomar el minimo del vector de posiciones de elementos por encima de la media")
+message("")
 
 # f ) Crea otro vector y con los primeros n números impares.
-print("f)")
+message("f)")
 
 y <- seq(1, 2*n, 2)
-cat("Los primero n impares son ", y , sep = " ")
-cat("Tenemos ", length(y), " elementos en el vector de impares")
+cat("Los primero n impares son ", y, "\n")
+message("Tenemos ", length(y), " elementos en el vector de impares")
+message("")
 
 # g) Imprime los elementos x que ocupen las posiciones indicadas por los primeros 5 elementos de y
-print("g)")
+message("g)")
 
 first_elements <- x[y[1:5]]
-print(first_elements)
+message("Los elementos de x que ocupan las posiciones indicadas por los primeros 5 elementos de 5 son:")
+cat(first_elements, "\n")
+message("")
 
 
 # Ejercicio 2
-print("")
-print("EJERCICIO 2")
-print("================================================================================")
-print("")
+message("")
+message("EJERCICIO 2")
+message("================================================================================")
+message("")
 
 # Evaluar la siguiente función en una rejilla de valores equiespaciados en el intervalo
 # [−2, 2] con incremento 0.1:
 
 # Creo el conjunto de valores de la x sobre la que evaluamos la funcion
+message("Creamos el vector pedido en el enunciado")
 x <- seq(-2, 2, by = 0.1)
-cat("El conjunto de valores de x es ", x) ; print("")
+message("El conjunto de valores de x es ", x)
+message("")
 
 # Evaluo la funcion por trozos usando mascaras logicas para anular ciertos trozos
 # Por tanto, expresamos los trozos como sumandos acompañados por la mascara que multiplica
@@ -89,10 +105,10 @@ y <-
 cat("El conjunto de valores de la imagen es ", y, "\n")
 
 # Ejercicio 3
-print("")
-print("EJERCICIO 3")
-print("================================================================================")
-print("")
+message("")
+message("EJERCICIO 3")
+message("================================================================================")
+message("")
 
 # Crea un vector con nombre x que contenga 50 valores aleatorios de una distribución
 # uniforme en el intervalo unidad usando la función runif (previamente ja la semilla
@@ -103,7 +119,7 @@ x <- runif(50)
 cat("Los 50 valores aleatorios son:\n", x, "\n")
 
 # a) Calcula cuántos de sus elementos están en el intervalo (0.25, 0.75).
-print("a)")
+message("a)")
 
 # Tomo el vector de elementos que cumple la condicion
 elements_in_interval = x[x>= 0.25 & x <= 0.75]
