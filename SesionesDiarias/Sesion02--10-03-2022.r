@@ -417,3 +417,124 @@ message("")
 
 # El resultado obtenido es el mismo que el que obtuvimos previamente
 # Esto me hace pensar que R usa este proceso de descomposicion para computar las soluciones
+
+
+# Ejercicio 4
+#===================================================================================================
+message("EJERCICIO 4")
+message("================================================================================")
+message("")
+
+# Considera el sistema Ax = b denido como sigue:
+# Para n = 3 crea la matriz de coeficientes A como un matriz cuadrada A de dimensión n cuya primera
+# columna sea 1, 2, . . . , n, la segunda 1^n, 2^n, ... n^n
+# Crea un vector b como resultado del producto (matricial) de A por un vector de n unos.
+
+# Dimension de la matriz
+n <- 3
+
+# Las columnas son potencias de la columna base [1 2 ... n]
+# Asi que creo esta primera columna
+base_col <- 1:n
+
+# Genero la matriz pedida usando la columna base
+# TODO -- no se como hacerlo sin el bucle for
+X <- c(base_col)
+for(n in 2:n){
+    X <- c(X, base_col ^ n)
+}
+dim(X) <- c(n, n)
+
+# Generamos el vector de terminos independientes multiplicando X por un vector de 1's
+one_column <- rep(1, n)
+b <- X %*% one_column
+message("El vector de terminos independientes es:")
+print(b)
+message("")
+
+message("La matriz X generada es:")
+print(X)
+message("")
+
+# Resuelve el sistema usando la función solve.
+message("Resolvemos el sistema anteriormente planteado")
+result <- solve(X, b)
+message("El resultado es:")
+print(result)
+message("")
+
+# Observa que tal y como hemos definido el sistema la solución x es un vector de n
+# unos. Calcula el máximo de las diferencias x − 1 en valor absoluto.
+
+# Empezamos calculando el vector de diferencias
+diff_vec <- result - 1
+message("Las diferencias del vector solucion menos 1's es:")
+print(diff_vec)
+message("")
+
+# Ahora calculamos el maximo del vector de diferencias
+max_diff <- max(diff_vec)
+message("La diferencia maxima del vector solucion - 1 es: ", max_diff)
+message("")
+
+# Repite el ejercicio para n = 4, 5, . . . 12. Comenta en cada caso las dicultades del
+# problema en relación a la condición de la matriz de coecientes.
+
+# Para evitar tener que repetir el codigo, encapsulamos todo lo anterior en una funcion
+funcion_ejercicio <- function(n) {
+    message("==> Repitiendo el ejercicio para n = ", n)
+    message("")
+
+    # Las columnas son potencias de la columna base [1 2 ... n]
+    # Asi que creo esta primera columna
+    base_col <- 1:n
+
+    # Genero la matriz pedida usando la columna base
+    # TODO -- no se como hacerlo sin el bucle for
+    X <- c(base_col)
+    for(n in 2:n){
+        X <- c(X, base_col ^ n)
+    }
+    dim(X) <- c(n, n)
+
+    # Generamos el vector de terminos independientes multiplicando X por un vector de 1's
+    one_column <- rep(1, n)
+    b <- X %*% one_column
+    message("El vector de terminos independientes es:")
+    print(b)
+    message("")
+
+    message("La matriz X generada es:")
+    print(X)
+    message("")
+
+    # Resuelve el sistema usando la función solve.
+    message("Resolvemos el sistema anteriormente planteado")
+    result <- solve(X, b)
+    message("El resultado es:")
+    print(result)
+    message("")
+
+    # Observa que tal y como hemos definido el sistema la solución x es un vector de n
+    # unos. Calcula el máximo de las diferencias x − 1 en valor absoluto.
+
+    # Empezamos calculando el vector de diferencias
+    diff_vec <- result - 1
+    message("Las diferencias del vector solucion menos 1's es:")
+    print(diff_vec)
+    message("")
+
+    # Ahora calculamos el maximo del vector de diferencias
+    max_diff <- max(diff_vec)
+    message("La diferencia maxima del vector solucion - 1 es: ", max_diff)
+    message("")
+
+    message("")
+    message("")
+}
+
+# Ahora ejecuto la funcion para los casos pedidos
+# Uso un bucle for para hacer esto de forma mas concisa
+for(n in 4:12){
+    try(funcion_ejercicio(n))
+}
