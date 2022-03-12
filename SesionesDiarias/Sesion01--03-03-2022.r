@@ -196,3 +196,76 @@ message("EJERCICIO 4")
 message("================================================================================")
 message("")
 
+# 4. Crea un vector con los 20 primeros términos de la progresión aritmética an = a1 +
+# (n − 1)d con a1 = 1 y d = 1.2. A partir de él:
+message("Creamos un vector con los primeros 20 termino de la progresion aritmetica")
+message("an = a1 + (n-1)d con a1 = 1 d = 1.2")
+message("")
+
+# Parametros de la progresion
+n <- 20
+a1 <- 1
+d <- 1.2
+
+# Creo el vector calculando el vector [n - 1 ; n \in 1..20] y a partir de el computo la progresion
+x <- 0:(n-1)
+x <- a1 + x * d
+cat("El vector con la progresion es: ", x, "\n")
+message("")
+
+# a ) Calcula la suma de sus elementos usando la función sum y comprueba que
+# coincide con fórmula n(a1 + an )/2, para n = 20.
+message("a)")
+
+# Calculo la suma haciendo la suma elemento a elemnto
+manually_computed_sum <- sum(x)
+
+# Calculo la suma usando la formula dada
+# Para ello creo una funcion que computa dicha formula
+sum_function <- function(n){
+    sum_value <- n * (a1 + x[n]) / 2.0
+    return(sum_value)
+}
+formula_sum <- sum_function(n)
+
+message("Suma de los valores computados a mano: ", manually_computed_sum)
+message("Suma de los valores usando la formula: ", formula_sum)
+message("")
+
+# b ) Calcula la (cuasi-)desviación típica usando la función sd y comprueba que
+# coincide con $|d| \sqrt{\frac{n(n+1)}{12}}$
+message("b)")
+
+# Calculo la cuasidesviacion usando la formula que relaciona cuasidesviacion
+# con desviacion
+quasi_manually_comp <- sd(x) * sqrt(n / (n-1))
+
+# Calculo ahora la cuasidesviacion usando la formula dada en el enunciado
+qusidesv_func <- function() {
+    quasi <- abs(d) * sqrt((n * (n+1)) / 12.0)
+    return(quasi)
+}
+quasi_formula_comp <- qusidesv_func()
+
+message("Cuasidesviacion computada en base a la desviacion: ", quasi_manually_comp)
+message("Cuasidesviacion computada usando la formula: ", quasi_formula_comp)
+message("")
+
+# c ) Calcula el producto de sus elementos usando la función prod y comprueba que coincide con:
+# $\prod (a_1 + kd) = d^n * \frac{\gamma(\frac{a_1}{d + n})}{\gamma(\frac{a1}{d})}
+# donde Γ denota la función gamma  (en R tienes esta función con el mismo nombre).
+message("c)")
+
+# Calculamos el producto a mano
+manually_computed_prod <- prod(x)
+
+# Calculamos el producto usando la formula dada en el enunciado
+prod_func <- function() {
+    prod <- (d^n) * gamma(a1 / (d + n)) / gamma(a1 / d)
+    return(prod)
+}
+formula_comp_prod <- prod_func()
+
+message("Producto de los elementos computada a mano: ", manually_computed_prod)
+message("Producto de los elementos computados usando la formula: ", formula_comp_prod)
+message("")
