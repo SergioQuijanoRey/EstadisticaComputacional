@@ -259,13 +259,26 @@ message("c)")
 # Calculamos el producto a mano
 manually_computed_prod <- prod(x)
 
-# Calculamos el producto usando la formula dada en el enunciado
-prod_func <- function() {
-    prod <- (d^n) * gamma(a1 / (d + n)) / gamma(a1 / d)
+# Calculamos el producto usando la primera formula dada en el enunciado
+first_prod_func <- function () {
+    # Computo un vector con los elementos del producto
+    k <- 0:(n-1)
+    product_elements <- a1 + k * d
+
+    # Devuelvo el producto de los elementos
+    return(prod(product_elements))
+}
+
+first_formula_comp_prod <- first_prod_func()
+
+# Calculamos el producto usando la segunda formula dada en el enunciado
+second_prod_func <- function() {
+    prod <- (d^n) * gamma((a1 / d) + n) / gamma(a1 / d)
     return(prod)
 }
-formula_comp_prod <- prod_func()
+second_formula_comp_prod <- second_prod_func()
 
 message("Producto de los elementos computada a mano: ", manually_computed_prod)
-message("Producto de los elementos computados usando la formula: ", formula_comp_prod)
+message("Producto de los elementos computados usando la primera formula: ", first_formula_comp_prod)
+message("Producto de los elementos computados usando la segunda formula: ", second_formula_comp_prod)
 message("")
