@@ -208,7 +208,7 @@ a1 <- 1
 d <- 1.2
 
 # Creo el vector calculando el vector [n - 1 ; n \in 1..20] y a partir de el computo la progresion
-x <- 0:(n-1)
+x <- 0:(n - 1)
 x <- a1 + x * d
 cat("El vector con la progresion es: ", x, "\n")
 message("")
@@ -222,7 +222,7 @@ manually_computed_sum <- sum(x)
 
 # Calculo la suma usando la formula dada
 # Para ello creo una funcion que computa dicha formula
-sum_function <- function(n){
+sum_function <- function(n) {
     sum_value <- n * (a1 + x[n]) / 2.0
     return(sum_value)
 }
@@ -241,7 +241,7 @@ quasi_manually_comp <- sd(x)
 
 # Calculo ahora la cuasidesviacion usando la formula dada en el enunciado
 qusidesv_func <- function() {
-    quasi <- abs(d) * sqrt((n * (n+1)) / 12.0)
+    quasi <- abs(d) * sqrt((n * (n + 1)) / 12.0)
     return(quasi)
 }
 quasi_formula_comp <- qusidesv_func()
@@ -259,9 +259,9 @@ message("c)")
 manually_computed_prod <- prod(x)
 
 # Calculamos el producto usando la primera formula dada en el enunciado
-first_prod_func <- function () {
+first_prod_func <- function() {
     # Computo un vector con los elementos del producto
-    k <- 0:(n-1)
+    k <- 0:(n - 1)
     product_elements <- a1 + k * d
 
     # Devuelvo el producto de los elementos
@@ -280,4 +280,30 @@ second_formula_comp_prod <- second_prod_func()
 message("Producto de los elementos computada a mano: ", manually_computed_prod)
 message("Producto de los elementos computados usando la primera formula: ", first_formula_comp_prod)
 message("Producto de los elementos computados usando la segunda formula: ", second_formula_comp_prod)
+message("")
+
+# Ejercicio 5
+message("EJERCICIO 5")
+message("================================================================================")
+message("")
+
+# 5. Crea un vector x con elementos 2, 2, 8, 7, 6, 1 y 5. Después, escribiendo una única
+# sentencia calcula las diferencias sucesivas entre sus elementos.
+# Nota: En R existe una función que hace esto exactamente, se trata de la función
+# diff. Resuelve este ejercicio sin usarla.
+
+# Creamos el vector
+x <- c(2, 2, 8, 7, 6, 1, 5)
+cat("El vector con el que vamos a trabajar es: ", x, "\n")
+message("")
+
+# Calculo las diferencias en una unica sentencia
+# Hago la diferencia del mismo vector pero indexandolo con un shift de una unidad
+diferencias <- x[2:length(x)] - x[1:length(x) - 1]
+
+# Ahora computo las diferencias con la orden de R para comprobar el resultado
+diferencias_R <- diff(x)
+
+cat("El vector de diferencias que he calculado es: ", diferencias, "\n")
+cat("El vector de diferencias calculado con la sentencia de R es: ", diferencias_R, "\n")
 message("")
