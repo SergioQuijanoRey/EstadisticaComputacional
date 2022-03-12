@@ -307,3 +307,46 @@ diferencias_R <- diff(x)
 cat("El vector de diferencias que he calculado es: ", diferencias, "\n")
 cat("El vector de diferencias calculado con la sentencia de R es: ", diferencias_R, "\n")
 message("")
+
+# EJERCICIO &
+message("EJERCICIO 6")
+message("================================================================================")
+message("")
+# 6. Crea un vector con nombre ABE con las letras del abecedario en mayúscula. Con
+# dicho vector:
+message("Creamos el vector con las letras del abecedario en mayusculas")
+ABE <- LETTERS
+cat("Dicho vector es: ", ABE, "\n")
+message("")
+
+# a ) Selecciona aleatoriamente 5 letras (usando la función sample con argumento
+# replace=FALSE) y almacénalas en un vector con nombre ABE.5.
+message("a)")
+
+message("Elegimos 5 letras de forma aleatoria")
+ABE.5 <- sample(ABE, size = 5, replace = FALSE)
+cat("Las letras seleccionadas son: ", ABE.5, "\n")
+message("")
+
+# b ) Crea un vector (con nombre PAL) con 2 elementos consistentes en 2 "palabras"
+# formadas colocando aleatoriamente las 5 letras anteriores sin repeticiones. Las
+# palabras no tienen que estar en el diccionario.
+message("b)")
+
+# Creamos las dos palabras haciendo sample de las 5 letras sin reemplazamiento
+message("Creamos dos palabras aleatorias usando las 5 letras anteriores")
+
+# Tomo las 5 letras en un orden aleatorio
+# Ahora tengo dos vectores de letras, cuando quiero una unica palabra
+first_word <- sample(ABE.5, replace = FALSE)
+second_word <- sample(ABE.5, replace = FALSE)
+
+# Los vectores de letras los colapso a una palabra
+first_word <- paste(first_word, collapse = "")
+second_word <- paste(second_word, collapse = "")
+
+# Ahora creo un vector con dos palabras
+PAL <- c(first_word, second_word)
+
+cat("El vector con las dos palabras es: ", PAL, "\n")
+message("")
