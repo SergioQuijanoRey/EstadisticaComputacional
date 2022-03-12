@@ -243,6 +243,9 @@ message("")
 
 # Ejercicio 3
 #===================================================================================================
+message("EJERCICIO 2.1")
+message("================================================================================")
+message("")
 
 # Utiliza el código que aparece a continuación de este cuadro para generar una muestra de
 # observaciones de las variables Y y X de tamaño n = 5 de la forma siguiente: las obser-
@@ -257,8 +260,17 @@ set.seed(2)
 x<-rnorm(n)
 y<-1+x+rnorm(n,0,0.1)
 
+message("Los datos aleatorios para realizar la regresion son:")
+cat("Valores de x: ", x, "\n")
+cat("Valores de y: ", y, "\n")
+message("")
+
 # Generamos los datos para resolver el sistema
 X <- cbind(rep(1, n), x)
+
+message("La matriz que vamos a usar para resolver la regresion es:")
+print(X)
+message("")
 
 # Calculamos (X'X)⁻¹
 pre_matrix <- solve(t(X)%*%X)
@@ -270,13 +282,21 @@ pre_matrix <- solve(t(X)%*%X)
 # demasiado las soluciones de las esperadas
 betta_hat <- pre_matrix %*% t(X) %*% y
 
+cat("Los coeficientes de regresion obtenidos son: ", betta_hat, "\n")
+message("")
+
 # Representamos graficamente el modelo lineal
+message("Mostrando graficamente la regresion")
+message("")
 curve(1+x,-3,3)
 points(x, y)
 curve(betta_hat[1] + betta_hat[2]*x, -3, 3, add = TRUE, col = 2 )
 
 # Repetimos el proceso para n = 50
 # Cargamos unos datos aleatorios
+message("==> Repetimos el proceso para 50 puntos")
+message("")
+
 n<-50
 set.seed(2)
 x<-rnorm(n)
@@ -286,19 +306,28 @@ y<-1+x+rnorm(n,0,0.1)
 X <- cbind(rep(1, n), x)
 
 # Calculamos (X'X)⁻¹
-pre_matrix <- solve(t(X)%*%X)
+pre_matrix <- solve(t(X) %*% X)
 
 # Calculamos ahora los coeficientes
 # El resultado es [0.9872414 0.9957350], todavia mas cercano a [1 1]
 betta_hat <- pre_matrix %*% t(X) %*% y
 
+cat("Los coeficientes de regresion ahora son: ", betta_hat, "\n")
+message("")
+
 # Representamos graficamente el modelo lineal
+message("Representando graficamente la regresion")
+message("")
+
 curve(1+x,-3,3)
 points(x, y)
 curve(betta_hat[1] + betta_hat[2]*x, -3, 3, add = TRUE, col = 2 )
 
 # Repetimos el proceso para n = 500
 # Cargamos unos datos aleatorios
+message("==> Repetimos el proceso para 500 puntos")
+message("")
+
 n<-500
 set.seed(2)
 x<-rnorm(n)
@@ -316,7 +345,13 @@ pre_matrix <- solve(t(X)%*%X)
 # con la que nos acercamos a la solucion verdadera del modelo
 betta_hat <- pre_matrix %*% t(X) %*% y
 
+cat("Los coeficientes de regresion ahora son: ", betta_hat, "\n")
+message("")
+
 # Representamos graficamente el modelo lineal
+message("Representando graficamente la regresion")
+message("")
+
 curve(1+x,-3,3)
 points(x, y)
 curve(betta_hat[1] + betta_hat[2]*x, -3, 3, add = TRUE, col = 2 )
