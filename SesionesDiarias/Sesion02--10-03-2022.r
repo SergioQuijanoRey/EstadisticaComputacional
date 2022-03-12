@@ -1,23 +1,35 @@
+# Sesion 10 Marzo 2022
+# Sergio Quijano Rey
+# sergioquijano@correo.ugr.es
+#
+# NOTA: como estamos mostrando mensajes por pantalla, lo recomendable es ejecutar o bien el script
+# por lineas en un REPL o bien ejecutar todo el script usando `R --no-echo -f Sesion02-10-03-2022.r`
+# para evitar que se muestren por pantalla tambien las lineas de codigo, haciendo que los mensajes
+# por pantalla sean ilegibles
+
 # Ejercicio 1
 #===================================================================================================
-print("EJERCICIO 1")
-print("================================================================================")
+message("EJERCICIO 1")
+message("================================================================================")
 
 # Ejecuta las siguientes sentencias y extrae conclusiones sobre el tipo de objeto que de-
 # vuelven:
 
 # Generamos una matriz 3x3 con los terminos ordenados de menor a mayor por columnas
-A<-matrix(1:9,3,3)
-cat("La matriz A es: ", A, "\n")
-
+A <- matrix(1:9, 3, 3)
+message("La matriz A es:") ; print(A)
+message("")
 
 # Generamos un vector [1, 2, 3]
-x<-1:3
+x <- 1:3
 cat("El vector x es: ", x, "\n")
+message("")
 
 # Muestra un vector columna con tres elementos
-result <- A%*%x
-cat("El resultado A%*%x es: ", result, "\n")
+result <- A %*% x
+message("El resultado A%*%x es: ")
+print(result)
+message("")
 
 # Esta operacion devuelve:
 # Error in A %*% t(x) : non-conformable arguments
@@ -25,26 +37,49 @@ cat("El resultado A%*%x es: ", result, "\n")
 # Pero cuando trasponemos el vector, obtenemos una matriz en formato fila, que al
 # operar no se transforma
 # Asi que creo que la conversion automatica vector -> matriz pasa los vectores a formato columna
-A%*%t(x)
+
+# Uso try para que el resto del script se pueda ejecutar
+message("Computando A %*% t(x")
+try({
+    result <- A %*% t(x)
+    message("El resultado de A %*% t(x) es:")
+    print(result)
+    return(result)
+})
+message("")
+
 
 # Si funciona, devuelve un vector fila con el resultado de la operacion
 # Asi que en este caso, R esta haciendo la conversion de vector a matriz para
 # multiplicar viendo las dimensiones y concluyendo que tiene que convertirlo en formato fila
-x%*%A
+result <- x %*% A
+message("El resultado de x %*% A es:")
+print(result)
+message("")
 
 # También funciona y da el mismo resultado
 # Parece que R convierte a matriz siempre en formato fila, como ya hemos dicho
 # Y en este caso si que sirve
-t(x)%*%A
+result <- t(x) %*% A
+message("El resultado de t(x) %*% A es:")
+print(result)
+message("")
 
 # Da como resultado una matriz de un unico elemento
 # t(x) creo que siempre da la matriz en formato fila
 # Al multiplicar matriz por vector, creo que R convierte fijandose en las dimensiones
 # para que la operacion tenga sentido. Y en este caso hay que hacer fila * columna
-t(x)%*%x
+result <- t(x) %*% x
+message("El resultado de t(x) %*% A es:")
+print(result)
+message("")
+
 
 # Ejercicio 2
 #===================================================================================================
+
+message("EJERCICIO 2")
+message("================================================================================")
 
 # Ejecuta las siguientes sentencias en R y formula los sistemas se resuelven en cada caso:
 
