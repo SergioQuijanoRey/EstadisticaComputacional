@@ -236,9 +236,8 @@ message("")
 # coincide con $|d| \sqrt{\frac{n(n+1)}{12}}$
 message("b)")
 
-# Calculo la cuasidesviacion usando la formula que relaciona cuasidesviacion
-# con desviacion
-quasi_manually_comp <- sd(x) * sqrt(n / (n-1))
+# Calculo la cuasidesviacion usando la instruccion de R
+quasi_manually_comp <- sd(x)
 
 # Calculo ahora la cuasidesviacion usando la formula dada en el enunciado
 qusidesv_func <- function() {
@@ -247,7 +246,7 @@ qusidesv_func <- function() {
 }
 quasi_formula_comp <- qusidesv_func()
 
-message("Cuasidesviacion computada en base a la desviacion: ", quasi_manually_comp)
+message("Cuasidesviacion computada con la instruccion de R: ", quasi_manually_comp)
 message("Cuasidesviacion computada usando la formula: ", quasi_formula_comp)
 message("")
 
