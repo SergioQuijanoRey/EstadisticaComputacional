@@ -243,7 +243,7 @@ message("")
 
 # Ejercicio 3
 #===================================================================================================
-message("EJERCICIO 2.1")
+message("EJERCICIO 3.2")
 message("================================================================================")
 message("")
 
@@ -363,3 +363,57 @@ curve(betta_hat[1] + betta_hat[2]*x, -3, 3, add = TRUE, col = 2 )
 # en cada momento. Por ejemplo, en el siguiente ejecicio vemos la optimizacion usando QR
 # Ademas, estas rutinas usan por debajo LAPACK que esta programado en FORTRAN, mucho mas rapido
 # que R (que seria el lenguaje usado a la hora de nosotros realizar una implementacion)
+
+# Ejercicio 3.3
+#===================================================================================================
+message("EJERCICIO 3.3")
+message("================================================================================")
+message("")
+
+# Volvemos a generar los datos con 5 elementos
+n<-5
+set.seed(2)
+x<-rnorm(n)
+y<-1+x+rnorm(n,0,0.1)
+
+message("Los datos aleatorios para realizar la regresion son:")
+cat("Valores de x: ", x, "\n")
+cat("Valores de y: ", y, "\n")
+message("")
+
+# Generamos la matriz para resolver el sistema
+# Haremos la descomposicion QR de esta matriz
+X <- cbind(rep(1, n), x)
+
+message("La matriz que vamos a usar para resolver la regresion es:")
+print(X)
+message("")
+
+# Empezamos computando la descomposicion QR
+qr_descomp <- qr(X)
+X.Q <- qr.Q(qr_descomp)
+X.R <- qr.R(qr_descomp)
+
+message("Desomponemos la matriz X usando QR")
+message("")
+message("La matriz Q es:")
+print(X.Q)
+message("")
+message("La matriz R es:")
+print(X.R)
+message("")
+
+# Calculamos la matriz intermedia Q'y
+inter_matrix <- t(X.Q) %*% y
+message("La matriz intermedia Q'y es:")
+cat(inter_matrix, "\n")
+message("")
+
+# Solucionamos el sistema usando backsolve
+result <- backsolve(X.R, inter_matrix)
+message("El resultado obtenido usando esta descomposicion es:")
+print(result)
+message("")
+
+# El resultado obtenido es el mismo que el que obtuvimos previamente
+# Esto me hace pensar que R usa este proceso de descomposicion para computar las soluciones
