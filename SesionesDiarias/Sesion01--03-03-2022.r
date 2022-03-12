@@ -71,7 +71,7 @@ message("")
 # f ) Crea otro vector y con los primeros n números impares.
 message("f)")
 
-y <- seq(1, 2*n, 2)
+y <- seq(1, by = 2, length.out = n)
 cat("Los primero n impares son ", y, "\n")
 message("Tenemos ", length(y), " elementos en el vector de impares")
 message("")
@@ -106,8 +106,13 @@ y <-
     (x >= -2 & x < -1)*(1) +
     (x >= -1 & x < 0)*(log(x*x)) +
     (x >= 0 & x < 1)*(log(x*x + 1)) +
-    (x >= 2)*(2)
+    (x >= 1)*(2)
 cat("El conjunto de valores de la imagen es ", y, "\n")
+message("")
+
+message("Los valores NAN los sustituyo por 0")
+y[is.nan(y)] <- 0
+cat("Los valores de y ahora son: ", y, "\n")
 message("")
 
 # Ejercicio 3
@@ -184,3 +189,10 @@ message("Calculamos la media del vector remplazado")
 mx <- mean(x)
 cat("Ahora la media de x es", mx, "\n")
 message("Como era de esperar, ahora la media es menor al no estar ignorando los NA y estar usando el valor mas bajo del rango (0)")
+message("")
+
+# Ejercicio 4
+message("EJERCICIO 4")
+message("================================================================================")
+message("")
+
