@@ -253,9 +253,22 @@ message("e)")
 message("")
 
 # Empezamos usando la orden transform
-datos.n["x_tipi_trans"] <- transform(datos.n, x_tipi_trans <- (xi - x_mean) / sqrt(x_quasivar))
-datos.n["y_tipi_trans"] <- transform(datos.n, y_tipi_trans <- (yi - y_mean) / sqrt(y_quasivar))
+datos.n.transform <- datos.n
+datos.n.transform <- transform(datos.n.transform, x_tipi_trans = (xi - x_mean) / sqrt(x_quasivar))
+datos.n.transform <- transform(datos.n.transform, y_tipi_trans = (yi - y_mean) / sqrt(y_quasivar))
 
 message("Tras el trasnform, el dataset queda:")
-print(datos.n)
+print(datos.n.transform)
+message("")
+
+# Realizamos la misma transformacion pero con within
+datos.n.within <- datos.n
+
+datos.n.within <- within(datos.n.within, {
+    x_tipi_trans <- (xi - x_mean) / sqrt(x_quasivar)
+    y_tipi_trans = (yi - y_mean) / sqrt(y_quasivar)
+})
+
+message("Tras el within, el dataset queda:")
+print(datos.n.within)
 message("")
