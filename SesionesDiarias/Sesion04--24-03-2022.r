@@ -270,3 +270,18 @@ write.table(resumen, file = "resumen.txt", sep = " ", row.names = FALSE, col.nam
 # texto (resumen2.txt ). Hazlo de forma que puedas leerlo después con read.csv,
 # resultando un data frame conteniendo columnas con los resúmenes descriptivos
 # (mínimo, primer cuartil, mediana, etc.) para cada grupo en formato numérico.
+
+message("d)")
+message("")
+
+# Usamos la funcion aggregate para aplicar la funcion summary segun los valores de un factor
+# Usamos aggregate y no tapply porque queremos la salida en un dataframe y no en una lista
+custom_summary <- aggregate(olimpics$TIME, list(olimpics$Gender), summary)
+
+message("El resumen de los tiempos segun el genero es:")
+print(custom_summary)
+message("")
+
+# Guardamos este resumen en un fichero de texto
+file_name <- "resumen2.txt"
+write.csv(custom_summary, file = file_name, row.names = FALSE)
