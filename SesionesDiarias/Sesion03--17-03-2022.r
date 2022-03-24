@@ -272,3 +272,115 @@ datos.n.within <- within(datos.n.within, {
 message("Tras el within, el dataset queda:")
 print(datos.n.within)
 message("")
+
+# Ejercicio 3
+#===================================================================================================
+
+message("EJERCICIO 3")
+message("================================================================================")
+message("")
+
+# a ) Imprime en la venta de la consola las primeras 5 las del data frame ChickWeight
+# y las 3 últimas, utilizando para ello las funciones head y tail, respectivamente.
+message("a)")
+message("")
+
+# Tomo el dataset en una variable, para trabajar mas comodamente
+data <- ChickWeight
+
+# Mostramos las primeras 5 filas
+message("Las primeras cinco filas del dataset son:")
+print(head(data, 5))
+message("")
+
+# Mostramos las tres ultimas filas
+message("Las tres ultimas filas del dataset son:")
+print(tail(data, 3))
+message("")
+
+# b ) Imprime la estructura del objeto ChickWeight.
+message("b)")
+message("")
+
+message("La estructura del objeto es:")
+print(str(data))
+message("")
+
+# c ) Realiza un resumen descriptivo numérico elemental de todas las variables del
+# data frame con summary.
+
+message("c)")
+message("")
+
+message("El summary de los datos es:")
+print(summary(data))
+message("")
+
+# d ) Realiza el mismo tipo de resumen pero ahora solo de la variable weight pa-
+# ra los distintos niveles del factor dieta, usando la función tapply. Almacena
+# el resultado en un objeto con nombre peso.dieta. ¾Qué tipo de objeto es
+# peso.dieta
+
+message("d)")
+message("")
+
+# Tomamos los datos pedidos y los mostramos por pantalla
+peso.dieta <- tapply(data$weight, data$Diet, summary)
+message("El resumen de la variable peso organizada segun la dieta seguida es:")
+print(peso.dieta)
+message("")
+
+# Ahora mostramos el tipo de dato:
+message("Mostrando el tipo de dato de peso.dieta:")
+message("")
+
+message("Si hacemos class() nos da:")
+print(class(peso.dieta))
+message("")
+
+message("Si hacemos is.list() nos da:")
+print(is.list(reg))
+message("")
+
+message("Si hacemos typeof:")
+print(typeof(peso.dieta))
+message("")
+
+# Por tanto, parece que estamos obteniendo como resultado una lista
+# Esto ya lo sospechabamos al ver como hace print del resultado
+# Segun la documentacion:
+#
+# If ‘FUN’ does not return a single atomic value, ‘tapply’ returns
+# an array of mode ‘list’ whose components are the values of the
+# individual calls to ‘FUN’, i.e., the result is a list with a ‘dim’
+# attribute.
+
+# e) Crea un data frame (peso.dieta.2) colocando por columnas el resumen ob-
+# tenido del peso para cada tipo de dieta. Cada columna tendrá como nombre el
+# de la correspondiente medida descriptiva (Min., 1st Qu., etc.).
+
+message("e)")
+message("")
+
+# peso.dieta.2 <- data.frame(tapply(peso.dieta))
+
+message("TODO -- no se como se hace esto")
+# print(peso.dieta.2)
+message("")
+
+
+# f ) La función aggregate permite resumir columnas de un data frame para cada
+# uno de los niveles de un factor . Utiliza esta función para realizar el mismo
+# resumen que realizaste antes en el objeto peso.dieta. ¾Qué tipo de objeto
+# devuelve esta función? Vuelve a crear el data frame peso.dieta.2 con la es-
+# tructura especicada antes a partir del objeto que devuelve aggregate.
+
+message("f)")
+message("")
+
+peso.dieta.2 <- aggregate(peso.dieta, list(peso.dieta), print)
+
+message("El dataframe con los datos del resumen del peso en base a la dieta, usando aggregate, es:")
+# print(peso.dieta.2)
+message("")
+
