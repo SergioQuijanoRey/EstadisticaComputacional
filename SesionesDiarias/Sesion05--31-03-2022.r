@@ -321,3 +321,70 @@ message("")
 assert_double_eq("Resultado de la cuarta comprobacion", res$media.aritm, 4.5)
 assert_is_na("Resultado de la cuarta comprobacion", res$media.geom)
 assert_is_na("Resultado de la cuarta comprobacion", res$media.arm)
+
+
+# Segunda funcion elemental
+#=================================================================================
+
+
+message("Segunda funcion elemental")
+message("#=================================================================================")
+message("")
+
+# 2. La mediana es una medida de posición central. Para un vector de datos numéricos x
+# la mediana es el valor que divide los datos ordenados en dos grupos iguales. Observa
+# que cuando el número de datos es par no hay ningún valor que cumpla este papel,
+# en ese caso se dene la mediana como la media de los dos valores centrales.
+# Con esta denición construye una función que calcule la mediana de un vector de
+# datos. La función tendrá por nombre mediana y tan sólo un argumento x (el vector
+# de datos). El valor que debe devolver es la mediana calculada. Una vez que tengas la
+# función, crea una versión que incluya comprobaciones básicas como que el argumento
+# proporcionado es numérico, y si tiene datos perdidos, en cuyo caso deberá ignorarlos
+# para el cálculo.
+# Finalmente comprueba el resultado de tu función con los siguientes resultados:
+
+# Calcula la mediana de un vector de datos numericos
+# En caso de que el numero de elementos sea par, la mediana es la media de los dos elementos
+# centrales
+# En caso de que haya NA en el vector, se muestra un warning y estos valores se ignoran
+# El vector de entrada no tiene por que estar ordenado, de esto se encarga la funcion
+mediana <- function(x) {
+    # Comprobamos que el vector sea numerico
+    if(is.numeric(x) == FALSE) {
+        # Mostramos un mensaje de error
+        warning("ERROR, se esperaba un vector numerico")
+
+        # No computamos ninguna media
+        return(NA)
+    }
+
+    # Comprobamos datos perdidos. En caso de encontrarlos, los ignoramos
+    if(length(x[is.na(x)]) > 0) {
+        # Mostramos un mensaje por pantalla
+        warning("CUIDADO! Hay valores perdidos en el vector, que vamos a igrnorar")
+
+        # Limpiamos el vector de valores NA
+        no_na_values <- x[!is.na(x)]
+        x <- x[no_na_values]
+    }
+
+    # Odenamos los valores del vector
+    sorted <- sort(x)
+
+    # Computamos la mediana, dependiendo de si tenemos un numero par o impar de valores
+    if(length(sorted) %% 2 == 0) {
+        return(mediana_par(sorted))
+    }
+    return mediana_impar(sorted)
+}
+
+mediana_impar <- function(x) {
+    mediana_val <- x[length(x) // 2 + 1]
+    return(mediana_val)
+}
+
+mediana_par <- function(x) {
+    first <- x[length(x) // 2]
+    second <- x[length(x) // 2]
+    return((first + second) / 2.0)
+}
