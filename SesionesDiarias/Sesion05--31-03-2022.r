@@ -423,3 +423,114 @@ assert_is_na("Resultado de la quinta comprobacion", res)
 message("Resultado de la quinta comprobacion:")
 print(res)
 message("")
+
+# Tercera funcion elemental
+#=================================================================================
+
+message("Tercera funcion elemental")
+message("#=================================================================================")
+message("")
+
+# 3. Los cuantiles (cuartiles, deciles, percentiles, etc.) constituyen medidas de posición
+# en general. Para un vector de datos numéricos x los cuartiles son tres valores (Q1 ,
+# Q2 y Q3 ) que dividen los datos en 4 grupos iguales, siendo por tanto Q2 igual a la
+# mediana.
+
+# a ) Construye una función con nombre cuartiles y tan sólo un argumento x
+# (el vector de datos), que calcule los cuartiles. El valor que debe devolver la
+# función es una lista con los tres cuartiles calculados. La función debe incluir
+# comprobaciones básicas como que el argumento proporcionado es numérico, y
+# si tiene datos perdidos, en cuyo caso deberá ignorarlos para el cálculo.
+
+# Calcula Q1, Q2, Q3 de un vector de datos numerico
+# Debe ser un vector numerico, en otro caso devolvemos NA
+# Si contiene valores NA, se muestra un mensaje de advertencia, y se computa ignorando estos valores
+# El vector de entrada no tiene por que estar ordenado. De esto se encarga la funcion
+cuartiles <- function(x) {
+    # Comprobamos que el vector sea numerico
+    if(is.numeric(x) == FALSE) {
+        # Mostramos un mensaje de error
+        warning("ERROR, se esperaba un vector numerico")
+
+        # No computamos ninguna media
+        return(NA)
+    }
+
+    # Comprobamos datos perdidos. En caso de encontrarlos, los ignoramos
+    if(length(x[is.na(x)]) > 0) {
+        # Mostramos un mensaje por pantalla
+        warning("CUIDADO! Hay valores perdidos en el vector, que vamos a igrnorar")
+
+        # Limpiamos el vector de valores NA
+        no_na_values <- x[!is.na(x)]
+        x <- x[no_na_values]
+    }
+
+    # Tenemos que trabajar con el vector ordenador
+    sorted <- sort(x)
+
+    # Calculamos Q1
+    q1_pos <- length(sorted) * 0.25
+    q1 <- NA
+    if(custom.is.integer(q1_pos)) {
+        q1 <- sorted[q1_pos]
+    } else {
+        q1 <- (sorted[q1_pos] + sorted[q1_pos + 1]) / 2.0
+    }
+
+    # Calculamos Q2
+    # Es la mediana, que ya tenemos programada
+    q2 <- mediana(x)
+
+    # Calculamos Q3
+    q3_pos <- (length(sorted) %/% 4) * 0.75
+    q3 <- NA
+    if(custom.is.integer(q1_pos)) {
+        q3 <- sorted[q3_pos]
+    } else {
+        q3 <- (sorted[q3_pos] + sorted[q3_pos + 1]) / 2.0
+    }
+
+    # Devolvemos la lista con los resultados
+    return(list(q1 = q1, q2 = q2, q3 = q3))
+}
+
+custom.is.integer <- function(value) {
+    if(as.integer(value) == value) {
+        return(TRUE)
+    }
+
+    return(FALSE)
+}
+
+
+# b ) En el paquete stats tenemos la función quantile que permite calcular el cuantil
+# de orden 0 < α < 1, denido como el valor que deja por debajo el α ∗ 100 %
+# de los datos. Inspecciona la ayuda de la función y compara para unos datos
+# el resultado que te da la función que has calculado con el que te daría esta
+# función.
+
+# Usando la funcion quantile, vamos a escribir los tests unitarios con las funciones para realizar
+# comprobaciones que hemos desarrollado
+# De hecho, escribo una funcion para realizar las tres comprobaciones (una por cuartil)
+comprobacion_cuartiles <- function(x, name) {
+    res <- cuartiles(x)
+    assert_double_eq(name, res$q1, quantile(x, 0.25))
+    assert_double_eq(name, res$q2, quantile(x, 0.5))
+    assert_double_eq(name, res$q3, quantile(x, 0.75))
+
+}
+
+x <- c(1:10)
+res <- cuartiles(x)
+comprobacion_cuartiles(x, "Primera comprobacion")
+message("Resultados de la primera comprobacion")
+print(res)
+message("")
+
+x <- c(1:9)
+res <- cuartiles(x)
+comprobacion_cuartiles(x, "Segunda comprobacion")
+message("Resultados de la segunda comprobacion")
+print(res)
+message("")
