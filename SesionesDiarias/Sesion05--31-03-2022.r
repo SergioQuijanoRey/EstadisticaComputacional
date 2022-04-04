@@ -203,7 +203,6 @@ message("")
 # Primera funcion elemental
 #=================================================================================
 
-
 message("Primera funcion elemental")
 message("#=================================================================================")
 message("")
@@ -326,7 +325,6 @@ assert_is_na("Resultado de la cuarta comprobacion", res$media.arm)
 # Segunda funcion elemental
 #=================================================================================
 
-
 message("Segunda funcion elemental")
 message("#=================================================================================")
 message("")
@@ -375,16 +373,53 @@ mediana <- function(x) {
     if(length(sorted) %% 2 == 0) {
         return(mediana_par(sorted))
     }
-    return mediana_impar(sorted)
+    return(mediana_impar(sorted))
 }
 
+# Mediana cuando el vector de entrada esta limpiado y es de longitud impar
 mediana_impar <- function(x) {
-    mediana_val <- x[length(x) // 2 + 1]
+    mediana_val <- x[length(x) %/% 2 + 1]
     return(mediana_val)
 }
 
+# Mediana cuando el vector de entrada esta limpiado y es de longitud par
 mediana_par <- function(x) {
-    first <- x[length(x) // 2]
-    second <- x[length(x) // 2]
+    first <- x[length(x) %/% 2]
+    second <- x[length(x) %/% 2 + 1]
     return((first + second) / 2.0)
 }
+
+
+# Realizamos algunas comprobaciones a partir de los ejemplos del guion de practicas de la asignatura
+
+# Primera comprobacion
+res <- mediana(1:5)
+assert_double_eq("Resultado de la primera comprobacion", res, 3, 0.0000001)
+message("Resultado de la primera comprobacion:")
+print(res)
+message("")
+
+res <-  mediana(1:6)
+assert_double_eq("Resultado de la segunda comprobacion", res, 3.5, 0.0000001)
+message("Resultado de la segunda comprobacion:")
+print(res)
+message("")
+
+res <- mediana(c(1:6,NA))
+assert_double_eq("Resultado de la tercera comprobacion", res, 3.5, 0.0000001)
+message("Resultado de la tercera comprobacion:")
+print(res)
+message("")
+
+set.seed(1)
+res <- mediana(runif(20))
+assert_double_eq("Resultado de la cuarta comprobacion", res, 0.6009837, 0.00001)
+message("Resultado de la cuarta comprobacion:")
+print(res)
+message("")
+
+res <- mediana("hola")
+assert_is_na("Resultado de la quinta comprobacion", res)
+message("Resultado de la quinta comprobacion:")
+print(res)
+message("")
