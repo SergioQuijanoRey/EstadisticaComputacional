@@ -487,6 +487,15 @@ assert_double_eq <- function(msg, first_val, second_val, eps = 0.001) {
     }
 }
 
+# Comprobamos que dos elementos comparables con el operador == son eferectivamente iguales
+assert_eq <- function(msg, first_val, second_val) {
+    cond <- first_val == second_val
+    if(cond == FALSE) {
+        warning(first_val, " != ", second_val)
+        stop(msg)
+    }
+}
+
 
 message("Comparando uniroot vs nuestra implementacion en la primera funcion con derivacion numerica")
 
@@ -561,4 +570,147 @@ message("")
 message("Tercer caso: obtenido con uniroot funcion:")
 print(resultado_uniroot$root)
 message("")
+message("")
+
+
+# EJERCICIO Propuesto
+#================================================================================
+
+message("EJERCICIO Propuesto")
+message("#================================================================================")
+message("")
+
+# Calcula los [n] primeros elementos de la sucesion:
+#   x_1 = [x1]
+#   x_{n+1} = r * x_n (1 - x_n)
+diff.eq <- function(x1, r, n) {
+
+    # Lista con los elementos que guardamos
+    sucesion <- list()
+
+    # Elemento inicial
+    xn <- x1
+    sucesion <- c(sucesion, xn)
+
+    # Aplicamos la sucesion
+    for(i in 2:n) {
+        xn <- r * xn * (1 - xn)
+        sucesion <- c(sucesion, xn)
+    }
+
+    return(list(xn = xn, sucesion = sucesion))
+}
+
+# a ) Ejecuta la función para r = 2 y 0 < x1 < 1. Deberías obtener que xn tiende a
+# 0.5 cuando n tiende a innito.
+message("a)")
+message("")
+
+# Probamos con un ejemplo
+x1 <- 0.77
+r <- 2.0
+n <- 100
+res <- diff.eq(x1, r, n)
+xn <- res$xn
+suc <- res$sucesion
+assert_double_eq("Comprobamos la sucesion programada", xn, 0.5, 1e-6)
+assert_eq("Comprobamos la longitud de la sucesion programada", length(suc), n)
+message("Para x1 = ", x1, ", r = ", r, " n = ", n, " se obtiene x_n = ", xn)
+message("")
+
+
+# Probamos con otro ejemplo
+x1 <- 0.25
+r <- 2.0
+n <- 20
+res <- diff.eq(x1, r, n)
+xn <- res$xn
+suc <- res$sucesion
+assert_double_eq("Comprobamos la sucesion programada", xn, 0.5, 1e-6)
+assert_eq("Comprobamos la longitud de la sucesion programada", length(suc), n)
+message("Para x1 = ", x1, ", r = ", r, " n = ", n, " se obtiene x_n = ", xn)
+message("")
+
+# Probamos con otro ejemplo
+x1 <- 0.15
+r <- 2.0
+n <- 10
+res <- diff.eq(x1, r, n)
+xn <- res$xn
+suc <- res$sucesion
+assert_double_eq("Comprobamos la sucesion programada", xn, 0.5, 1e-6)
+assert_eq("Comprobamos la longitud de la sucesion programada", length(suc), n)
+message("Para x1 = ", x1, ", r = ", r, " n = ", n, " se obtiene x_n = ", xn)
+message("")
+
+# b ) Representa grácamente los primeros n = 500 de la sucesión para x1 = 0.95 y
+# r = 2.99. La gráca la puedes obtener usando la función plot con la sintaxis
+# plot(1:500,v), siendo v el vector devuelto por la función.
+
+message("b)")
+message("")
+
+message("Mostramos graficamente la sucesion x1 = 0.95, r = 2.99, n = 500")
+sucesion <- diff.eq(x1 = 0.95, r = 2.99, n = 500)$suc
+plot(1:500, sucesion)
+
+# c ) Escribe una segunda función dif.eq2 con argumentos x1 y r que devuelva una
+# lista incluyendo, además del vector anterior (v), el número de iteraciones (n)
+# necesarias hasta alcanzar el criterio de convergencia siguiente:
+# |xn+1 − xn | < 0.02
+# Comprueba tu función evaluándola en x1 = 0.95 y r = 2.99, en cuyo caso
+# deberías obtener que n = 84
+
+message("c)")
+message("")
+
+diff.eq2 <- function(x1, r) {
+    # Lista con los elementos que guardamos
+    sucesion <- list()
+
+    # Elemento inicial
+    xn <- x1
+    sucesion <- c(sucesion, xn)
+
+    # Empezamos con cero iteraciones, porque no contamos xn <- x1 como iteracion
+    counter <- 0
+
+    # Condicion de parada que empieza siendo falsa
+    stop_cond <- FALSE
+
+    # Aplicamos la sucesion
+    while(stop_cond == FALSE) {
+
+        # Aplicamos una nueva iteracion
+        # Usamos una variable intermedia para calcular la distancia entre dos terminos consecutivos
+        xnext <- r * xn * (1 - xn)
+        dist_consec <- abs(xnext - xn)
+        counter <- counter + 1
+
+        # Una vez que hemos calculado la distancia podemos hacer la asignacion
+        xn <- xnext
+        sucesion <- c(sucesion, xn)
+
+        # Comprobamos la condicion de parada
+        stop_cond <- dist_consec < 0.02
+    }
+
+    return(list(xn = xn, sucesion = as.vector(sucesion), iterations = counter))
+}
+
+# Realizamos la comprobacion usando el ejemplo dado en el guion de practicas
+x1 <- 0.95
+r <- 2.99
+n_expected <- 84
+
+# Tomamos el resultado y hacemos una asercion
+res <- diff.eq2(x1, r)
+assert_eq("Comprobacion de seguridad en la segunda funcion", res$iterations, n_expected)
+
+# Ahora que la asercion ha sido comprobada, mostramos por pantalla los resultados
+message("Los resultados de la segunda funcion para x1 = 0.95, r = 2.99 son:")
+message("\txn: ", res$xn)
+message("\titerations: ", res$iterations)
+message("\tsucesion: ")
+print(res$sucesion)
 message("")
