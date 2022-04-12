@@ -285,3 +285,8 @@ message("")
 # Guardamos este resumen en un fichero de texto
 file_name <- "resumen2.txt"
 write.csv(custom_summary, file = file_name, row.names = FALSE)
+
+data_back <- read.csv(file = file_name, header = TRUE)
+message("El datafreame cargado desde el fichero salvado previamente es:")
+print(data_back)
+message("")
