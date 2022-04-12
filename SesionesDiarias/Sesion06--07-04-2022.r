@@ -472,20 +472,93 @@ message("Resultado obtenido:")
 print(resultado)
 message("")
 
-# Realizamos las comparaciones con uniroot
+# REALIZAMOS LAS COMPARACIONES CON UNIROOT
+# Voy a usar la siguiente funcion para comprobar que los valores obtenidos con ambas funciones
+# coinciden aproximadamente:
+
+# Comprobamos que dos numeros flotantes sean el mismo, con cierta tolerancia
+# En caso de que no sean iguales, mostramos un mensaje de error e interrumpimos la ejecucion del
+# programa
+assert_double_eq <- function(msg, first_val, second_val, eps = 0.001) {
+    cond <- abs(first_val - second_val) < eps
+    if(cond == FALSE) {
+        warning(first_val, " != ", second_val)
+        stop(msg)
+    }
+}
+
+
 message("Comparando uniroot vs nuestra implementacion en la primera funcion con derivacion numerica")
+
+
+# --> Primer Caso
+curr_f <- function(x) x^2 - 5
+xo <- 2
+
 resultado <- algoritmo.NR(
-    f = function(x) x^2 - 5,
-    x0 = 2,
+    f = curr_f,
+    x0 = x0,
     tol = 0.000001,
     nmax = 10000,
     dibuja = FALSE
 )
+resultado_uniroot <- uniroot(curr_f, c(x0 - 3, x0 + 3))
 
-resultado_uniroot <- uniroot(function(x) x^2 - 5, c(2 - 3, 2 + 3))
-message("Resultado obtenido con nuestra funcion:")
-print(resultado)
+# Realizamos la comprobacion usando la funcionalidad de asercion antes de mostrar los mensajes
+assert_double_eq("Comprobando dos funcionalidades en el primer caso", resultado$raiz, resultado_uniroot$root, 1e-5)
+
+message("Primer caso: resultado obtenido con nuestra funcion:")
+print(resultado$raiz)
 message("")
-message("Resultado obtenido con uniroot funcion:")
+message("Primer caso: obtenido con uniroot funcion:")
 print(resultado_uniroot$root)
+message("")
+message("")
+
+# --> Segundo Caso
+xo <- 2
+curr_f <- function(x) x^3 - 2*x -5
+
+resultado <- algoritmo.NR(
+    f = curr_f,
+    x0 = x0,
+    tol = 0.000001,
+    nmax = 10000,
+    dibuja = FALSE
+)
+resultado_uniroot <- uniroot(curr_f, c(x0 - 10, x0 + 10))
+
+# Realizamos la comprobacion usando la funcionalidad de asercion antes de mostrar los mensajes
+assert_double_eq("Comprobando dos funcionalidades en el tercer caso", resultado$raiz, resultado_uniroot$root, 1e-5)
+
+message("Segundo caso: resultado obtenido con nuestra funcion:")
+print(resultado$raiz)
+message("")
+message("Segundo caso: obtenido con uniroot funcion:")
+print(resultado_uniroot$root)
+message("")
+message("")
+
+# --> Tercer Caso
+curr_f <- function(x) exp(2*x) - x - 6
+x0 = 3
+
+resultado <- algoritmo.NR(
+    f = curr_f,
+    x0 = x0,
+    tol = 0.000001,
+    nmax = 10000,
+    dibuja = FALSE
+)
+resultado_uniroot <- uniroot(curr_f, c(x0 - 3, x0 + 3))
+
+# Realizamos la comprobacion usando la funcionalidad de asercion antes de mostrar los mensajes
+assert_double_eq("Comprobando dos funcionalidades en el tercer caso", resultado$raiz, resultado_uniroot$root, 1e-4)
+
+message("Tercer caso: resultado obtenido con nuestra funcion:")
+print(resultado$raiz)
+message("")
+message("Tercer caso: obtenido con uniroot funcion:")
+print(resultado_uniroot$root)
+message("")
 message("")
