@@ -469,12 +469,15 @@ cuartiles <- function(x) {
     # Tenemos que trabajar con el vector ordenador
     sorted <- sort(x)
 
+    # El calculo de los cuartiles depende de la paridad de la longitud
+    es_par <- length(sorted) %% 2 == 0
+
     # Calculamos Q1
-    q1_pos <- length(sorted) * 0.25
-    q1 <- NA
-    if(custom.is.integer(q1_pos)) {
+    if(es_par == FALSE) {
+        q1_pos <- length(sorted) * 0.25 + 1
         q1 <- sorted[q1_pos]
     } else {
+        q1_pos <- length(sorted) * 0.25
         q1 <- (sorted[q1_pos] + sorted[q1_pos + 1]) / 2.0
     }
 
@@ -483,11 +486,11 @@ cuartiles <- function(x) {
     q2 <- mediana(x)
 
     # Calculamos Q3
-    q3_pos <- (length(sorted) %/% 4) * 0.75
-    q3 <- NA
-    if(custom.is.integer(q1_pos)) {
+    if(es_par == FALSE) {
+        q3_pos <- length(sorted) * 0.75 + 1
         q3 <- sorted[q3_pos]
     } else {
+        q3_pos <- length(sorted) * 0.75
         q3 <- (sorted[q3_pos] + sorted[q3_pos + 1]) / 2.0
     }
 
@@ -521,16 +524,23 @@ comprobacion_cuartiles <- function(x, name) {
 
 }
 
-x <- c(1:10)
+x <- c(1:9)
 res <- cuartiles(x)
 comprobacion_cuartiles(x, "Primera comprobacion")
 message("Resultados de la primera comprobacion")
 print(res)
 message("")
 
-x <- c(1:9)
+x <- c(1:27)
 res <- cuartiles(x)
 comprobacion_cuartiles(x, "Segunda comprobacion")
 message("Resultados de la segunda comprobacion")
 print(res)
 message("")
+
+x <- c(1:10)
+res <- cuartiles(x)
+comprobacion_cuartiles(x, "Tercera comprobacion")
+message("Resultados de la tercera comprobacion")
+message("")
+
