@@ -414,9 +414,35 @@ message("")
 message("f)")
 message("")
 
-peso.dieta.2 <- aggregate(peso.dieta, list(peso.dieta), print)
+peso.dieta <- aggregate(data$weight, by = list(data$Diet), summary)
 
 message("El dataframe con los datos del resumen del peso en base a la dieta, usando aggregate, es:")
-# print(peso.dieta.2)
+print(peso.dieta)
 message("")
 
+# Ahora mostramos el tipo de dato:
+message("Mostrando el tipo de dato de peso.dieta:")
+message("")
+
+message("Si hacemos class() nos da:")
+print(class(peso.dieta))
+message("")
+
+message("Si hacemos is.list() nos da:")
+print(is.list(reg))
+message("")
+
+message("Si hacemos typeof:")
+print(typeof(peso.dieta))
+message("")
+
+# Por tanto, ahora en vez de obtener una lista con el resumen, obtenemos un dataframe como el que
+# hemos creado en peso.dieta.2. Por tanto, este proceso de creacion de peso.dieta.2 ya esta
+# programado en R
+
+# Por tanto, ahora es trivial crear el objeto peso.dieta.2
+peso.dieta.2 <- peso.dieta
+
+message("peso.dieta.2 ahora es:")
+print(peso.dieta.2)
+message("")
