@@ -359,13 +359,49 @@ message("")
 # tenido del peso para cada tipo de dieta. Cada columna tendrá como nombre el
 # de la correspondiente medida descriptiva (Min., 1st Qu., etc.).
 
+
 message("e)")
 message("")
 
-# peso.dieta.2 <- data.frame(tapply(peso.dieta))
+# TODO -- para este ejercicio debe haber una forma mas sencilla de programarlo
+# Estoy usando funciones de filtrado que devuelven otras funciones, y esto me parece demasiado complejo
 
-message("TODO -- no se como se hace esto")
-# print(peso.dieta.2)
+# Funcion que devuelve una funcion filtro para determinada posicion
+# Necesitamos hacer esto, porque sapply espera una funcion de un unico parametro: la entrada de la
+# lista que esta procesando en ese momento
+# Por eso paso de unas funcion de dos parametros a una funcion de un unico parametro con este estilo
+# currificacion
+filter_func <- function(pos) {
+
+    # Funcion que devolvemos y que, dada una entrada de una listas, se queda con una posicion
+    # en concreto de dicha lista
+    inner_func <- function(list_entry) {
+        return(list_entry[pos])
+    }
+
+    return(inner_func)
+}
+
+# Filtramos las listas usando sapply y nuestra funcion de filtrado
+min <- sapply(peso.dieta, filter_func(1))
+q1  <- sapply(peso.dieta, filter_func(2))
+q2  <- sapply(peso.dieta, filter_func(3))
+q3  <- sapply(peso.dieta, filter_func(4))
+max <- sapply(peso.dieta, filter_func(5))
+
+# Creamos el dataframe con los valores filtrados
+peso.dieta.2 <- data.frame(
+    min = min,
+    q1 = q1,
+    q2 = q2,
+    q3 = q3,
+    max = max,
+    row.names = 1:4
+)
+
+# Mostramos el resultado obtenid# Mostramos el resultado obtenidoo
+message("El dataframe con el resumen de las estadisticas del peso organizadas por el tipo de dietas es:")
+print(peso.dieta.2)
 message("")
 
 
