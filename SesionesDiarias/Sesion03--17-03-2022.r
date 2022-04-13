@@ -446,3 +446,92 @@ peso.dieta.2 <- peso.dieta
 message("peso.dieta.2 ahora es:")
 print(peso.dieta.2)
 message("")
+
+# g) Crea un data frame (Chick100) con una submuestra de los datos contenidos
+# en ChickWeight seleccionando aleatoriamente (sin reemplazo) 100
+
+message("g)")
+message("")
+
+
+Chick100 <- data[sample(nrow(data), size = 100, replace = FALSE), ]
+
+message("Las 100 muestras seleccionadas aleatoriamente sin reemplazo son:")
+print(Chick100)
+message("")
+
+# h ) Muestra el data frame Chick100 con sus columnas permutadas aleatoriamente .
+message("h)")
+message("")
+
+# Para permutar, vuelvo a usar sample para realizar la permutacion
+# Solo que ahora lo hago por columnas y usando todas las columnas
+
+col_perm_chick100 <- Chick100[, sample(ncol(Chick100), size = ncol(Chick100), replace = FALSE)]
+message("El dataset Chick100 con las columnas permutadas es:")
+print(head(col_perm_chick100))
+message("")
+
+# i ) Muestra el data frame Chick100 con sus columnas por orden alfabético.
+message("i)")
+message("")
+
+# Obtengo la lista con los nombres ordenados
+sorted_col_names <- sort(colnames(Chick100))
+
+# Aplico dicha lista indexada para indexar las columnas del dataframe
+col_sorted_chick100 <- Chick100[, sorted_col_names]
+
+message("El dataframe Chick100 con las columnas por orden alfabetico es:")
+print(head(col_sorted_chick100))
+message("")
+
+# j ) Muestra los datos del data frame Chick100 ordenados según la variable Diet
+# (orden ascendente). Observa que cómo trata R los empates en dicha ordenación.
+# Repite la operación rompiendo los empates de acuerdo al valor en la variable
+# Weight.
+message("j)")
+message("")
+
+# TODO -- no se que criterio se usa para realizar el desempate
+chick100_sorted_diet <- Chick100[
+    with(Chick100, order(Chick100$Diet, decreasing = FALSE)),
+]
+message("El dataframe Chick100 ordenado ascendentemente por la variable dieta es:")
+print(chick100_sorted_diet)
+message("")
+
+# Ahora ordenamos usando dos columnas
+# Para esto, ya necesito la orden `order` con `with`
+chick100_sorted_diet_weight <- Chick100[
+    # Primero ordeno por dieta, luego ordeno por peso
+    with(Chick100, order(Chick100$Diet, Chick100$weight, decreasing = FALSE)),
+]
+message("El dataframe Chick100 ordenado ascendentemente por la variable dieta y desempatado por peso es:")
+print(chick100_sorted_diet_weight)
+message("")
+
+# k ) Extrae del data frame Chick100 una submuestra conteniendo solo una obser-
+# vación para cada tipo de dieta (variable Diet), en concreto la que corresponda
+# al mayor valor de la variable weight. [Sugerencia: ordena las las del data
+# frame según weight en orden descendente, después puedes usar la función
+# duplicated6 aplicada a columna Diet para quedarse solo con la primera ob-
+# servación correspondiente a cada tipo de dieta.
+message("k)")
+message("")
+
+# Ordenamos por peso, siendo los primeros individuos los mas pesados
+chick100_sorted_weight <- Chick100[
+    # Primero ordeno por dieta, luego ordeno por peso
+    with(Chick100, order(Chick100$weight, decreasing = TRUE)),
+]
+
+# Nos quedamos con los elementos del dataframe que no tienen repetida la columna dieta
+# Es decir, con los elementos que primero aparecen con determinada dieta
+# Por el orden, el elemento de cierta dieta con mayor peso
+diet_not_duplicated <- !duplicated(chick100_sorted_weight$Diet)
+max_weight_per_diet <- chick100_sorted_weight[diet_not_duplicated, ]
+
+message("La observacion con mayor peso por dieta es:")
+print(max_weight_per_diet)
+message("")
