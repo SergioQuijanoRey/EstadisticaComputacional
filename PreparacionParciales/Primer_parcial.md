@@ -331,6 +331,11 @@ l <- list(x1 = x1, x2 = x2)
 x <- runif(200)
 l$x <- x
 l[["x"]] <- x
+
+# Obtenemos un vector con todos los elementos seguidos
+# Lo que yo conozco como flatten
+# La funcion unlist se puede usar para desestructurar otros tipos de datos
+v <- unlist(l)
 ```
 
 ## Funciones apply
@@ -343,7 +348,7 @@ sumas <- lapply(lista, sum)
 # Se hace print de forma mas compacta
 sumas <- sapply(lista, sum)
 
-
+# Se puede usar tapply para aplicar funciones en una lista y en un factor dado
 ```
 
 ----------------------------------------------------------------------------------------------------
@@ -358,7 +363,85 @@ xi <- c(1.2, 1.8, 2.2, 2.5, 1.1)
 yi <- c(15, 18, 10, 12, 16)
 ni <- c(12, 23, 5, 9, 11)
 datos <- data.frame(xi = xi, yi = yi, ni = ni)
+```
 
+## Operaciones básicas
+
+```r
+# Primeros y ultimos 5 elementos del dataframe
+head(data, 5)
+tail(data, 5)
+
+# Estructura del dataframe
+str(data)
+
+# Resumen con algunas estadisticas
+summary(data)
+```
+
+## Manipulación de dataframes
+
+```r
+# Supongamos que queremos tipificar dos variables xi, yi conociendo su media y varianza
+
+# Sintaxis transform:
+datos.n.new <- transform(
+    datos,
+    xi_tip = (xi - x_mean) / sqrt(x_quasivar),
+    yi_tip = (yi - y_mean) / sqrt(y_quasivar)
+)
+
+# Sintaxis within
+datos.n.new <- within(datos, {
+    xi_tip <- (xi - x_mean) / sqrt(x_quasivar)
+    yi_tip <- (yi - y_mean) / sqrt(y_quasivar)
+})
+
+
+# Aplicar una funcion segun un factor
+data <- Chick100
+peso.dieta <- tapply(data$weight, data$Diet, summary)
+
+
+# Aplicar una funcion, segun un factor, y guardar los resultados en un dataframe
+peso.dieta.2 <- aggregate(data$weight, by = list(data$Diet), summary)
+
+# Ordenamos un dataframe segun el valor de varias columnas
+data <- ChickWeight
+Chick100Ordered <- data[
+  with(Chick100, order(data$Diet, data$weight, decreasing = FALSE)),
+]
+
+# Acceder a los elementos del dataframe que no esten duplicados en el valor del factor Diet
+# El orden de las filas en el dataframe influyen
+NotDuplicated <- data[!duplicated(Chick100Ordered$Diet), ]
+
+# Se puede usar unlist para obtener todos los elementos del dataframe en una vector simple
+# Es lo que conozco como un flatten
+```
+
+## Acceso a columnas del dataframe
+
+```r
+xi <- c(1.2, 1.8, 2.2, 2.5, 1.1)
+yi <- c(15, 18, 10, 12, 16)
+ni <- c(12, 23, 5, 9, 11)
+datos <- data.frame(xi = xi, yi = yi, ni = ni)
+x <- datos["xi"]
+x <- datos$xi
+
+```
+
+## Muestreo en el dataframe
+
+```r
+data <- ChickWeight
+
+# Tomamos 100 filas sin muestreo
+Chick100 <- data[sample(1:nrow(data), size = 100, replace = FALSE), ]
+
+# Permutamos aleatoriamente las columnas del dataframe
+Chick100ColPerm <- data[, sample(1:ncol(data), size = ncol(data), replace = FALSE)]
 ```
 
 ----------------------------------------------------------------------------------------------------
