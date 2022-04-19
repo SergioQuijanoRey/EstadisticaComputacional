@@ -438,11 +438,15 @@ n <- 3
 base_col <- 1:n
 
 # Genero la matriz pedida usando la columna base
-# TODO -- no se como hacerlo sin el bucle for
+# Uso un bucle for. A continuacion muestro como hacerlo sin bucle for
 X <- c(base_col)
-for(n in 2:n){
+for(n in 2:n) {
     X <- c(X, base_col ^ n)
 }
+dim(X) <- c(n, n)
+
+# Se puede hacer sin for con rep de la siguiente forma:
+X <- rep(1:n, times = 1, each = n) ^ rep(1:n, times = n, each = 1)
 dim(X) <- c(n, n)
 
 # Generamos el vector de terminos independientes multiplicando X por un vector de 1's

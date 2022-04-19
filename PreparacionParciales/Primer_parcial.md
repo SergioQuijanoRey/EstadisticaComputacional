@@ -157,6 +157,39 @@ A <- matrix(1:9, 3, 3)
 # Creamos primero un vector, y luego asignamos las dimensiones
 A <- 1:9                # Tenemos un vector
 dim(A) <- c(3, 3)       # Asignamos dimensiones
+
+# Crear una matriz de la forma:
+# 1 2 ... n
+# 1^2 2^2 ... n^2
+# 1^3 2^3 ... n^3
+# ... ... ... ...
+# 1^n 2^n ... n^n
+#
+# Mi metodo:
+A <- rep(1:n, times = 1, each = n) ^ rep(1:n, times = n, each = 1)
+dim(A) <- c(n, n)
+
+# Metodo de la profesora:
+A <- matrix(
+    rep(1:n, times=n, each=n)^rep(1:n, times=n),
+    ncol=n,
+    nrow=n
+)
+
+# Creacion de una matriz como concatenacion de columnas
+x <- 1:10
+y <- 11:20
+z <- 21:30
+w <- 31:40
+
+# Concatenando por columnas
+A <- cbind(x, y, z, w)
+
+# Concatenando por filas
+A <- rbind(x, y, z, w)
+
+# Esto se puede hacer a mano concatenando filas con c(...) y luego asignando las dimensiones
+# Pero es mucho mas lento
 ```
 
 ## Operaciones matriciales
@@ -273,6 +306,61 @@ y<-1+x+rnorm(n,0,0.1)
 sol <- lin_reg_mse_qr(x, y)
 ```
 
+## Otras operaciones
+
+```r
+# Cambiamos el nombre de las columnas
+row.names(A) <- c("primera fila", "segunda fila")
+colnames(A) <- c("Autor", "Libro", "Precio")
+```
+
+----------------------------------------------------------------------------------------------------
+
+# Listas
+
+## Creación de listas
+
+```r
+# Ejemplo basico
+x1 = 1:3
+x2 = 4:6
+l <- list(x1 = x1, x2 = x2)
+
+# Añadir elementos a una lista
+# Las dos formas que pongo son equivalentes
+x <- runif(200)
+l$x <- x
+l[["x"]] <- x
+```
+
+## Funciones apply
+
+```r
+# Devuelve una lista
+sumas <- lapply(lista, sum)
+
+# Devuelve una lista
+# Se hace print de forma mas compacta
+sumas <- sapply(lista, sum)
+
+
+```
+
+----------------------------------------------------------------------------------------------------
+
+# Dataframes
+
+## Creación de dataframes
+
+```r
+# Forma clasica de crear un dataframe
+xi <- c(1.2, 1.8, 2.2, 2.5, 1.1)
+yi <- c(15, 18, 10, 12, 16)
+ni <- c(12, 23, 5, 9, 11)
+datos <- data.frame(xi = xi, yi = yi, ni = ni)
+
+```
+
 ----------------------------------------------------------------------------------------------------
 
 # Números aleatorios
@@ -311,4 +399,17 @@ points(x,y)
 
 # Añadimos una linea roja con la solucion que hemos encontrado
 curve(f, add = TRUE, col = 2)
+```
+
+--------------------------------------------------------------------------------
+
+# Control de errores
+
+```r
+try({
+    # Codigo que puede devolver un error
+    # ...
+})
+
+try(funcion_que_puede_fallar(n))
 ```
