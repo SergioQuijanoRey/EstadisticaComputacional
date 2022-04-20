@@ -504,6 +504,8 @@ curve(f, add = TRUE, col = 2)
 
 # Control de errores
 
+Para capturar un error y que no pare la ejecución del programa:
+
 ```r
 try({
     # Codigo que puede devolver un error
@@ -511,6 +513,23 @@ try({
 })
 
 try(funcion_que_puede_fallar(n))
+```
+
+Para levantar un error con un texto:
+
+```r
+if(cond){
+    stop("Mensaje de error")
+}
+```
+
+Podemos hacer lo mismo pero sin parar la ejecución, solo con un warning:
+
+
+```r
+if(cond){
+    warning("Mensaje de alerta")
+}
 ```
 
 --------------------------------------------------------------------------------
@@ -543,4 +562,51 @@ write.table(data2, filename, sep = "\t", row.names = FALSE, col.names = TRUE)
 # write.table o write.csv
 write(nombres, file = 'matriz.txt', ncol = 5, sep = ',')
 write(t(matriz), file = 'matriz.txt', ncol = 5, sep = ',', append = TRUE)
+```
+
+--------------------------------------------------------------------------------
+
+# Optimización y búsqueda de ceros
+
+Tenemos que definir la funcion de forma que solo reciba un parámetro, tipo lista, a optimizar. Por ejemplo:
+
+```r
+logl <- function(theta) {
+    # El parametro de entrada es una lista
+    a <- theta[1]
+    b <- theta[2]
+
+    # Logaritmo de la verosimilitud de una distribucion aleatoria
+    l <- sum(log(dgamma(x=muestra,shape=a,scale=b)))
+
+    # Devolvemos el negativo, porque dos de las tres librerias minimizan, y queremos maximizar esta funcion
+    return(-l)
+}
+```
+
+Para optimizar, podemos usar tres librerías:
+
+```r
+# Libreria por defecto de R, que minimiza
+a0 <- 1 # Valores iniciales
+b0 <- 1 # Valores iniciales
+res <- optim(par=c(a0,b0),fn=logl)
+
+# Libreria Rsolnp, que minimiza
+library(Rsolnp)
+b0 <- 1
+a0 <- 1
+res<-solnp(pars=c(a0,b0), fun=logl, LB=c(0,0))
+
+
+# Libreria maxLik, que maximiza. Por tanto, cambiamos el signo de la funcion de nuevo
+library(maxLik)
+res <- maxLik(function(theta) -logl(theta),start=c(1,1))
+res_depurado <- res$estimate)
+
+# Con esta libreria podemos incluir restricciones. Por ejemplo, para indicar que a, b > 0, usamos
+# las siguientes matrices para indicar esto:
+A <- matrix(c(1,0,0,1),2)
+B <- c(0,0)
+maxLik(logl2,start=c(1,1),constraints=list(ineqA=A,ineqB=B))
 ```
