@@ -500,6 +500,19 @@ points(x,y)
 curve(f, add = TRUE, col = 2)
 ```
 
+Ejemplo usado para mostrar dos gráficas de funciones superpuestas
+
+```r
+# Funcion que vamos a mostrar
+f<-function(x) x^2-5
+
+# Hacemos plot de la funcion en un intervalo
+curve(f,0,10)
+
+# Añadimos una linea horizontal
+abline(h=0,col=2)
+```
+
 --------------------------------------------------------------------------------
 
 # Control de errores
@@ -615,6 +628,25 @@ maxLik(logl2,start=c(1,1),constraints=list(ineqA=A,ineqB=B))
 
 # Funciones
 
+## Devolucion de valores
+
+Para un único valor:
+
+```r
+f <- function(x){
+    return(x^2)
+}
+```
+
+Para devolver varios valores necesitamos usar una lista
+
+```r
+f <- function(x){
+    return(list(x_square = x^2, x_cube = x^3))
+}
+
+```
+
 ## Comprobaciones de seguridad
 
 Podemos usar las funciones `missing` y `is.numeric` para sanear las entradas a una función. Esto se ve mejor con un ejemplo:
@@ -651,4 +683,17 @@ medias <- function(x) {
 
     # Resto de la funcion ...
 }
+```
+
+## Aproximaciones numéricas de la derivada
+
+```r
+# Libreria que se usa para la derivacion numerica
+library(numDeriv)
+
+# Funcion de ejemplo
+f <- function(x) exp(x) - x^2
+
+# Funcion que usa para evaluarse en un punto la derivada numerica en ese punto
+f.prima <- function(x) genD(func = f, x = x)$D[1]
 ```
