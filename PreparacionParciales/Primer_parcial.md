@@ -432,6 +432,9 @@ data2 <- na.omit(data)
 # data$x8 es un factor con dos niveles: empresas pequeñas y grandes
 empresas_grandes <- data[data$x8 == "grande",]
 empresas_pequeñas <- data[data$x8 == "pequeña",]
+
+# Para tipificar un dataframe
+scaled.data <- scale(data)
 ```
 
 ## Consultas sobre un dataframe
