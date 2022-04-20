@@ -213,6 +213,7 @@ medias <- function(x) {
     # Comprobamos que el vector sea numerico
     if(is.numeric(x) == FALSE) {
         # Mostramos un mensaje de error
+        # TODO -- aqui la profesora usa stop para interrumpir la ejecucion del programa
         warning("ERROR, se esperaba un vector numerico")
 
         # No computamos ninguna media
