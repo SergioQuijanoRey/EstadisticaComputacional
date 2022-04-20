@@ -418,6 +418,22 @@ NotDuplicated <- data[!duplicated(Chick100Ordered$Diet), ]
 
 # Se puede usar unlist para obtener todos los elementos del dataframe en una vector simple
 # Es lo que conozco como un flatten
+
+# Filtrar de un dataframe las filas en las que haya algun missing value
+data2 <- data[complete.cases(data), ]
+data2 <- na.omit(data)
+```
+
+## Consultas sobre un dataframe
+
+```r
+# Contar los valores perdidos (missing values) por columna
+valores_perdidos_por_columna <- lapply(data, is.na)
+valores_perdidos_por_columna <- sapply(valores_perdidos_por_columna, sum)
+
+# Contar el numero de filas sin missing values
+no_missing_values <- sum(complete.cases(data))
+
 ```
 
 ## Acceso a columnas del dataframe
@@ -495,4 +511,36 @@ try({
 })
 
 try(funcion_que_puede_fallar(n))
+```
+
+--------------------------------------------------------------------------------
+
+# Acceso a ficheros externos
+
+```r
+file <- "../SesionesDiarias/Census.csv"
+
+# Leemos de un csv
+# as.is sirve para indicar que columnas de tipo string queremos que se guarden como tipo factor
+# Se usa a la inversa, indicamos que columnas no queremos que sean tipo factor
+# Si hacemos as.is = NA, indicamos que todas las columnas de tipo string sean factores
+data <- read.csv(file, header = TRUE, as.is = rep(FALSE, 10))
+data <- read.csv(file, header = TRUE, as.is = NA)
+
+# Lectura de un fichero de forma generica
+# Da algo mas de flexibilidad que read.csv, como en el separador
+data <- read.table(filename, header = TRUE, sep = "\t", as.is = rep(FALSE, 10))
+
+
+# Escribimos una tabla de forma generica
+# Tenemos muchos mas parametros que podemps establecer, como eol END OF LINE
+write.table(data2, filename, sep = "\t", row.names = FALSE, col.names = TRUE)
+
+# Escribimos usando la funcion mas basica
+# Por ejemplo, tenemos una matriz y queremos guardarla en un fichero grabando los nombres de las
+# columnas, que estan guardadas en nombres
+# Cuando usamos esto, notar que tenemos que trasponer la matriz de datos, cosa que no hace falta con
+# write.table o write.csv
+write(nombres, file = 'matriz.txt', ncol = 5, sep = ',')
+write(t(matriz), file = 'matriz.txt', ncol = 5, sep = ',', append = TRUE)
 ```
