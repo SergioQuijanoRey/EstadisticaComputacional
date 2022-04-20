@@ -397,6 +397,11 @@ datos.n.new <- within(datos, {
     yi_tip <- (yi - y_mean) / sqrt(y_quasivar)
 })
 
+# Por ejemplo, para pasar la columna 'x8' a tipo factor, con ciertos nombres:
+data <- within(data, {
+    x8 <- factor(x8, labels = c("pequeña", "grande"))
+})
+
 
 # Aplicar una funcion segun un factor
 data <- Chick100
@@ -422,6 +427,11 @@ NotDuplicated <- data[!duplicated(Chick100Ordered$Diet), ]
 # Filtrar de un dataframe las filas en las que haya algun missing value
 data2 <- data[complete.cases(data), ]
 data2 <- na.omit(data)
+
+# Nos quedamos con las filas con un valor de un factor u otro
+# data$x8 es un factor con dos niveles: empresas pequeñas y grandes
+empresas_grandes <- data[data$x8 == "grande",]
+empresas_pequeñas <- data[data$x8 == "pequeña",]
 ```
 
 ## Consultas sobre un dataframe
