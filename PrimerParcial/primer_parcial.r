@@ -121,7 +121,7 @@ progresion_geometrica <- function(n, a1, r) {
     # Como estamos computando la formula an = a1 * r^(n-1), podemos calcular todos los elementos
     # directamente y no necesitamos un bucle for, que es mas ineficiente en R
     # Notar tambien que deberiamos hacer r^((1:n) - 1), pero esto es lo mismo que r^(0:(n-1))
-    v <- a1 * r ^ 0:(n-1)
+    v <- a1 * r ^ (0:(n-1))
 
     # Calculamos la suma y producto de forma directa
     suma1 <- sum(v)
@@ -138,7 +138,7 @@ progresion_geometrica <- function(n, a1, r) {
     }
 
     # La formula del producto solo es valida cuando a1, r > 0
-    if(ai <= 0 || r <= 0){
+    if(a1 <= 0 || r <= 0){
         # Uso warning porque no quiero detener la ejecucion del programa
         warning("Producto 2 solo se puede calcular cuando a1, r > 0")
         producto2 <- NA
@@ -151,4 +151,12 @@ progresion_geometrica <- function(n, a1, r) {
 }
 
 # Comprobamos los dos casos del examen
-res <-
+res <- progresion_geometrica(n = 20, a1 = 2, r = -0.5)
+message("En el primer caso, el resultado es:")
+print(res)
+message("")
+
+res <- progresion_geometrica(n = 20, a1 = 2, r = 0.5)
+message("En el segundo caso, el resultado es:")
+print(res)
+message("")
