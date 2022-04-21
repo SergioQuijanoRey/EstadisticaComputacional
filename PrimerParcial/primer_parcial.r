@@ -99,3 +99,56 @@ aire.mayo <- aire[aire$Month == month.name[5], ]
 message("El dataframe aire con solo datos de mayo es:")
 print(aire.mayo)
 message("")
+
+
+message("Ejercicio 3")
+message("================================================================================")
+
+# Calcula la progresion geometrica an = a1 * r^(n-1) y devuelve la suma y producto de sus elementos
+# Calcula dos sumas y dos productos, una vez con sum(), prod() y otra vez con formulas explicitas
+progresion_geometrica <- function(n, a1, r) {
+
+    # Comprobacion de seguridad
+    if(missing(n) || missing(a1) || missing(r)) {
+        stop("No has proporcionado todos los parametros de la funcion!!")
+    }
+
+    if(is.numeric(n) == FALSE || is.numeric(a1) == FALSE || is.numeric(r) == FALSE){
+        stop("Todos los parametros de la funcion deben ser numericos!!")
+    }
+
+    # Calculo la secuencia de la sucesion, que es la pieza central de esta funcion
+    # Como estamos computando la formula an = a1 * r^(n-1), podemos calcular todos los elementos
+    # directamente y no necesitamos un bucle for, que es mas ineficiente en R
+    # Notar tambien que deberiamos hacer r^((1:n) - 1), pero esto es lo mismo que r^(0:(n-1))
+    v <- a1 * r ^ 0:(n-1)
+
+    # Calculamos la suma y producto de forma directa
+    suma1 <- sum(v)
+    producto1 <- prod(v)
+
+    # Calculamos la suma y producto usando las formulas dadas en el examen
+    # La formula de la suma para r == 1 falla
+    if(r == 1){
+        # Uso warning porque no quiero detener la ejecucion del programa
+        warning("Suma 2 no se puede calcular para r == 1")
+        suma2 <- NA
+    }else{
+        suma2 <- a1 * (1 - r^n) / (1 - r)
+    }
+
+    # La formula del producto solo es valida cuando a1, r > 0
+    if(ai <= 0 || r <= 0){
+        # Uso warning porque no quiero detener la ejecucion del programa
+        warning("Producto 2 solo se puede calcular cuando a1, r > 0")
+        producto2 <- NA
+    }else{
+        producto2 <- sqrt(a1^2 * r^(n-1))^n
+    }
+
+    # Devolvemos todos los elementos en una lista
+    return(list(v = v, suma1 = suma1, suma2 = suma2, producto1 = producto1, producto2 = producto2))
+}
+
+# Comprobamos los dos casos del examen
+res <-
