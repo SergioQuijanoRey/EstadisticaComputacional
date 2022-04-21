@@ -160,3 +160,80 @@ res <- progresion_geometrica(n = 20, a1 = 2, r = 0.5)
 message("En el segundo caso, el resultado es:")
 print(res)
 message("")
+
+# Voy a realizar algunas comprobaciones de seguridad, a modo de "test unitarios" muy simples
+# No he encontrado ninguna libreria por defecto que traiga estas funcionalidades, asi que uso
+# estas funciones para realizar las aserciones
+
+# Comprobamos que dos numeros flotantes sean el mismo, con cierta tolerancia
+# En caso de que no sean iguales, mostramos un mensaje de error e interrumpimos la ejecucion del
+# programa
+assert_double_eq <- function(msg, first_val, second_val, eps = 0.001) {
+    cond <- abs(first_val - second_val) < eps
+    if(cond == FALSE) {
+        warning(first_val, " != ", second_val)
+        stop(msg)
+    }
+}
+
+# Asercion para una condicion booleana ada
+# En caso de que no sean cierta, mostramos un mensaje de error e interrumpimos la ejecucion del
+# programa
+assert <- function(msg, cond){
+    if(cond == FALSE) {
+        warning(first_val, " != ", second_val)
+        stop(msg)
+    }
+}
+
+# Comprobamos que un valor dado es NA. En caso de que no lo sea, mostramos un mensaje de error
+# e interrumpimos la ejecucion del programa
+assert_is_na <- function(msg, value) {
+    if(is.na(value) == FALSE) {
+        warning("El valor ", value, " no es NA")
+        stop(msg)
+    }
+}
+
+res <- progresion_geometrica(n = 5, a1 = 2, r = 1.1)
+assert_double_eq("Las dos sumas deben coincidir", res$suma1, res$suma2, eps = 1e-10)
+assert_double_eq("Los dos productos deben coincidir", res$producto1, res$producto2, eps = 1e-10)
+assert("La longitud de la secuencia debe ser n", length(res$v) == 5)
+
+res <- progresion_geometrica(n = 10, a1 = 1.4, r = 0.9)
+assert_double_eq("Las dos sumas deben coincidir", res$suma1, res$suma2, eps = 1e-10)
+assert_double_eq("Los dos productos deben coincidir", res$producto1, res$producto2, eps = 1e-10)
+assert("La longitud de la secuencia debe ser n", length(res$v) == 10)
+
+# Veo que obtengo NA cuando algunas condiciones de las entradas fallan
+res <- progresion_geometrica(n = 10, a1 = 1.4, r = -0.9)
+assert_double_eq("Las dos sumas deben coincidir", res$suma1, res$suma2, eps = 1e-10)
+assert_is_na("El producto 2 en este caso debe ser NA", res$producto2)
+assert("La longitud de la secuencia debe ser n", length(res$v) == 10)
+
+res <- progresion_geometrica(n = 10, a1 = 1.4, r = 1)
+assert_is_na("La suma 2 en este caso debe ser NA", res$suma2)
+assert_double_eq("Los dos productos deben coincidir", res$producto1, res$producto2, eps = 1e-10)
+assert("La longitud de la secuencia debe ser n", length(res$v) == 10)
+
+# Veo que la funcion falla cuando pasamos mal algunos parametros
+# Para esto uso try() para que el fallo de la funcion no detenga la ejecucion de todo el script
+try({
+    res <- progresion_geometrica(n = 10, a1 = 4)
+
+    # Este mensaje no se puede mostrar
+    message("ESTO NUNCA PUEDE OCURRIR")
+})
+message("")
+
+try({
+    res <- progresion_geometrica(n = 10, a1 = 4, r = function(x) x + 2)
+
+    # Este mensaje no se puede mostrar
+    message("ESTO NUNCA PUEDE OCURRIR")
+})
+message("")
+
+message("")
+message("==> Todos los 'test unitarios' han pasado")
+message("")
