@@ -1,4 +1,7 @@
 # Autor: Sergio Quijano Rey, sergioquijano@correo.ugr.es
+# NOTA: estoy ejecutando el programa en linux desde la terminal, usando:
+# R --no-echo -f ./primer_parcial.r, por eso muestro mensajes por pantalla usando print y message
+# De todas formas, se sigue pudiendo ejecutar el script por bloques sin ningun inconveniente
 
 message("Ejercicio 1")
 message("================================================================================")
@@ -108,7 +111,7 @@ message("=======================================================================
 # Calcula dos sumas y dos productos, una vez con sum(), prod() y otra vez con formulas explicitas
 progresion_geometrica <- function(n, a1, r) {
 
-    # Comprobacion de seguridad
+    # Comprobaciones de seguridad
     if(missing(n) || missing(a1) || missing(r)) {
         stop("No has proporcionado todos los parametros de la funcion!!")
     }
@@ -218,6 +221,7 @@ assert("La longitud de la secuencia debe ser n", length(res$v) == 10)
 
 # Veo que la funcion falla cuando pasamos mal algunos parametros
 # Para esto uso try() para que el fallo de la funcion no detenga la ejecucion de todo el script
+# Recordar que lanzo el script entero, y no ejecuto en bloques usando una REPL
 try({
     res <- progresion_geometrica(n = 10, a1 = 4)
 
