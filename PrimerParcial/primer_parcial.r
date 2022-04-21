@@ -63,3 +63,39 @@ curr_rows <- nrow(aire)
 filtered_rows <- prev_rows - curr_rows
 message("He filtrado ", filtered_rows, " filas al borrar missing values" )
 message("")
+
+# Convertimos Month a factor usando within
+aire <- within(aire, {
+    # Uso month.name para obtener los meses del año
+    # Solo hay meses del 5 al 9, asi que solo me quedo con esos nombres
+    Month <- factor(Month, labels = month.name[5:9])
+})
+message("Despues de aplicar un factor a meses, ahora la estructura es:")
+print(str(aire))
+message("")
+message("Las cinco primeras filas del dataframe son:")
+print(head(aire))
+message("")
+message("Las cinco ultimas filas del dataframe son:")
+print(tail(aire))
+message("")
+
+# Calculo las medianas, por el factor de los messes, usando aggregate
+# Me devuelve un dataframe con dos columnas, mes y valor de la mediana
+# Dos dataframes, uno por variable en la que estoy interesado
+med_ozone <- aggregate(aire$Ozone, by = list(aire$Month), median)
+med_wind <- aggregate(aire$Wind, by = list(aire$Month), median)
+
+message("Mediana del ozono agrupada por meses:")
+print(med_ozone)
+message("")
+message("Mediana del aire agrupada por meses:")
+print(med_wind)
+message("")
+
+# Creo el dataframe con los valores de aire que ocurren en mayo
+# Uso == month.name[5] y no == "May" o == "Mayo" para evitar problemas con el lenguaje del sistema
+aire.mayo <- aire[aire$Month == month.name[5], ]
+message("El dataframe aire con solo datos de mayo es:")
+print(aire.mayo)
+message("")
