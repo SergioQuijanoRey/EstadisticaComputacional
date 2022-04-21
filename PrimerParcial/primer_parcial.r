@@ -26,6 +26,11 @@ message("Los elementos que distan de mx mas de sx son:")
 print(elementos_buscados)
 message("")
 
+# Con esto es directo calcular el numero de estos elementos
+no_elemnentos_buscados <- length(elementos_buscados)
+message("nº elementos uqe distan de mx mas de sx son: ", no_elemnentos_buscados)
+message("")
+
 # Sustituyo por valores perdidos, usando la misma condicion que antes para indexar
 x[distancia_mx > sx] <- NA
 message("Tras poner NA, x queda:")
@@ -33,8 +38,11 @@ print(x)
 message("")
 
 # Cuento los multiplos de 3
+
 # Para eso, me quito primero los NA
 x_no_na <- x[is.na(x) == FALSE]
+
+# Ahora es facil aplicar la condicion y contar
 x_mult3 <- x_no_na[x_no_na %% 3 == 0]
 no_x_mult3 <- length(x_mult3)
 message("Hay ", no_x_mult3, " multiplos de 3 en el vector x")
