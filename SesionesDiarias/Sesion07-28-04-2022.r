@@ -129,3 +129,42 @@ message("\tLas personas 'custodial' son mayores que los otros dos puestos de tra
 message("\tLas mujeres manager son mas jovenes que los hombres manager, y con menos rango en la edad")
 message("\tLas mujeres 'clerical' tienen una mediana de edad parecida a los hombres 'clerical', pero presentan muchisima mas variedad en la edad")
 message("")
+
+message("Diagrama de dispersion de sal y startsal")
+plot(startsal,salary)
+message("")
+
+message("Regresion lineal entre salary y startsal")
+mod<-lm(salary~startsal)
+plot(startsal,salary)
+abline(mod,col='blue')
+message("Resultado de la regresion")
+print(mod)
+message("")
+
+# Realiza un estudio similar que permita descubrir una posible relación entre: (i) las va-
+# riables salary y age; y (ii) las variables salary y edu. ¾Qué puedes interpretar de los
+# grácos?
+
+message("Repetimos el estudio para salary y age")
+mod<-lm(salary~age)
+plot(age,salary)
+abline(mod,col='blue')
+message("Resultado de la regresion")
+print(mod)
+message("Conclusiones:")
+message("\tCada año que pasa parece que se pierden ~200$")
+message("\tSin embargo, no parece que haya mucha correlacion (por lo que muestra el grafico, no calculamos coeficientes)")
+message("")
+
+message("Repetimos el estudio para salary y educacion")
+mod<-lm(salary~edu)
+plot(edu,salary)
+abline(mod,col='blue')
+message("Resultado de la regresion")
+print(mod)
+message("Conclusiones:")
+message("\tConforme aumenta el valor de la educacion, aumenta el salario notablemente")
+message("\tEsto tiene logica si en los datos un mayor valor del factor 'edu' corresponde a una educacion mayor")
+message("")
+
