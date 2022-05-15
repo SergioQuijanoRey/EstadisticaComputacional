@@ -1,0 +1,190 @@
+---
+title: Sesión de prácticas 9, Estadística Computacional
+author:
+  - Sergio Quijano Rey
+  - sergioquijano@correo.ugr.es
+date: 12.05.2022
+---
+
+# Notas previas
+
+- Algunas salidas se muestran mal porque uso mucho `message` y `print`
+- Antes usaba estas funciones para mostrar por la consola de *Linux* los resultados y distintas secciones de la práctica
+- Para mejorar las salidas del programa, muchos `message()` se pueden sustituir por texto en *markdow* que muestre las mismas indicaciones que estaba mostrando con los mensajes en `R`.
+- Hago este proceso a mano, para mejorar la legibilidad del *notebook*
+
+# Carga de los datos
+
+Hacemos `as.is = NA` para que todos los factores se identifiquen en el dataframe como tal
+
+```{r }
+hatco <- read.csv("hatco2.csv", header = TRUE, as.is = NA)
+```
+
+Las primeras 10 filas del *dataframe* son:
+
+```{r}
+head(hatco, 10)
+```
+
+La estructura del *dataframe* leído es:
+
+```{r}
+str(hatco)
+```
+
+Representamos graficamente las variables con las que vamos a estar trabajando Nos interesa ver las correlaciones entre las variables
+
+```{r }
+plot(hatco[,c(6:13)])
+```
+
+Podemos ver que la fidelidad (variable que queremos predecir en base a las otras) esta ligeramente correlada linealmente con:
+
+- Velocidad
+- Servconj
+- Flexprec (ligeramente)
+
+Algunas variables explicativas parecen ser algo colineales:
+
+- Imgfvent y Imgfabri
+- Servconj y velocidad
+- Servconj y precio (muy ligeramente)
+
+Realizamos el ajuste lineal
+
+```{r }
+mod1 <- lm(fidelidad~velocidad+precio+flexprec+imgfabri+servconj+imgfvent+calidadp, hatco)
+mod1
+```
+
+Miramos la bondad del ajuste
+
+```{r }
+print(summary(mod1))
+```
+
+Realizamos el test ANOVA
+
+```{r }
+anovares <- anova(mod1)
+anovares
+```
+Usamos summary para ver si las percepciones son relevantes en la variable de salida:
+Viendo los p-valores que estan por debajo de 0.05, las unicas variables relevantes son (las que rechazan H0):
+
+- Flexprec
+- Servconj
+- Y ademas el parametro independiente $\beta_0$
+
+A un nivel de significación del 1%
+
+- Intercept ($\beta_0$) se rechaza pues su p-valor es $0.044 > 0.01$
+
+## Estudiamos la homocedasticidad
+
+```{r }
+residuos <- rstandard(mod1)
+predicciones <- mod1$fitted.values #' Las predicciones ya nos las da el objeto devuelto por lm
+```
+Gráfico de dispersión de los pares $\hat{y_i}, r_i$
+
+```{r}
+plot(predicciones, residuos)
+```
+
+Grafico de dispersion de los pares $x_{ij}, r_i$
+
+```{r, fig.height=20, fig.width=15}
+par(mfrow=c(4,2))
+for(j in 6:13){
+  plot(hatco[, j], residuos)
+}
+```
+
+**Conclusiones**:
+
+- Todos estos graficos muestran nubes de puntos aleatorias
+- Ademas, la dispersion parece uniforme, salvo en valores de la variable x_i donde tenemos pocos puntos
+
+## Estudiamos la incorrelacion
+
+Empezamos realizando una comprobación gráfica de que los datos están incorrelados. Para ello, mostramos gráficamente los errores estandarizados (que anteriormente calculábamos con `rstandar`) frente a la variable `empresa`
+
+```{r}
+plot(hatco$empresa, residuos)
+```
+
+A partir de estas gráficas, podemos extraer las siguientes **conclusiones**:
+
+- Parece que estamos visualizando un patrón aleatorio en la gráfica
+- Por tanto, parece que no existen las correlaciones que podrían invalidar las hipótesis iniciales que hemos tomado como dadas y que ahora estamos comprobando
+
+Ahora, usamos el *test* de *Durbin-Watson* para comprobar lo que hemos comentado previamente:
+
+```{r}
+# TODO -- no consigo instalar esta libreria
+# library(lmtest)
+# dwtest(modelo)
+```
+
+## Estudiamos la normalidad de los errores
+
+Los errores del modelo se asumen normales. Dicha hipótesis es fundamental para el desarrollo de la inferencia. Por tanto es esencial verificar esta hipótesis.
+
+Para realizar dicha verificación vamos a usar el *test* *Kolmogorov-Smirnov*:
+
+```{r}
+# Tomamos la media y desviacion de los residuos, porque estos parametros son necesarios para la
+# funcion ks.test. Si no pasamos estos parametros, se supone media cero y desviacion 1
+# Notar que deberian ser media cero y desviacion uno porque son residuos estandarizados. Pero tomamos
+# estos valores por si han ocurrido errores numericos, paliarlos un poco
+residuos.mean <- mean(residuos)
+residuos.sd <- sd(residuos)
+
+
+# Especificamos "pnorm" porque es la cdf de la distribucion con la que queremos comprobar
+ks.test(residuos, "pnorm", residuos.mean, residuos.sd)
+```
+
+Vemos que los residuos tienen media cero y desviación 1, porque como decimos en el comentario, estamos usando los residuos estandarizados:
+
+```{r}
+residuos.mean
+residuos.sd
+```
+
+Se confirma lo que decíamos anteriormente.
+
+Respecto a los resultados del *test*, extraemos las siguientes **conclusiones**:
+
+- Tenemos que $p-value \geq 0.05$, luego no podemos rechazar la hipótesis nula
+- Dicha hipótesis nula es que la distribución de los datos no sigue una normal estándar
+- Por tanto, no tenemos evidencia para pensar que los residuos no sigan una normal estándar, así que podemos pensar que sí que la sigue
+
+Ahora, para reforzar el resultado del test *Kolmogorov-Smirnov*, mostramos una visualización usando un **gráfico probabilístico normal** (también llamado gráfico *cuantil-cuantil*) usando `qqnorm`:
+
+```{r}
+qqnorm(residuos)
+
+# Usamos qqline para mostrar la linea que deberia seguir los datos para que al distribucion
+# siguiese realmente una distribucion normal
+qqline(residuos)
+```
+
+Con este gráfico lo que buscamos es que los datos se muestren gráficamente aproximadamente como una línea recta. Por tanto:
+
+- Los residuos se distribuyen de forma parecida a una normal, aunque no se ajusten a esta distribución perfectamente
+- Esto, en conjunto con los resultados del *test de Kolmogorov-Smirnov*, podemos pensar que los residuos siguen una distribución normal estándar, como buscábamos
+
+
+## Estudiamos la linealidad de los errores
+
+Hemos supuesto previamente la linealidad en la relación entre la respuesta y las variables explicativas. Esto se puede comprobar en los gráficos de dispersión que hemos mostrado previamente. Pero para esta tarea son más adecuados los gráficos *componente más residuo*, que mostramos a continuación:
+
+```{r}
+# Esta libreria no viene instalada por defecto, asi que hay que instalarla
+# antes de usarla antes de usarla
+# TODO -- descomentar cuando tenga instalada la libreria
+# library(car)
+```
