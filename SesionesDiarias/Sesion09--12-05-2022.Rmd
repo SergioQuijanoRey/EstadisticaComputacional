@@ -8,6 +8,9 @@ output:
     html_document:
         toc: true
         toc_depth: 3
+        toc_float: true
+        collapsed: true
+        number_sections: true
 ---
 
 # Notas previas
@@ -55,12 +58,16 @@ Algunas variables explicativas parecen ser algo colineales:
 - Servconj y velocidad
 - Servconj y precio (muy ligeramente)
 
+# Ajuste de un modelo lineal a los datos
+
 Realizamos el ajuste lineal
 
 ```{r }
 mod1 <- lm(fidelidad~velocidad+precio+flexprec+imgfabri+servconj+imgfvent+calidadp, hatco)
 mod1
 ```
+
+## Estudio de la bondad del ajuste
 
 Miramos la bondad del ajuste
 
@@ -76,6 +83,8 @@ anovares
 ```
 Usamos summary para ver si las percepciones son relevantes en la variable de salida:
 Viendo los p-valores que estan por debajo de 0.05, las unicas variables relevantes son (las que rechazan H0):
+
+<!-- TODO -- Aqui no estoy usando para nada el test ANOVA, creo que solo estoy usando el summary del mod1 -->
 
 - Flexprec
 - Servconj
@@ -320,3 +329,62 @@ points(
 Podemos observar que sus residuos son bajos en comparación al resto de empresas. Por tanto, no parece que sean datos problemáticos.
 
 ## Eliminación de observaciones anómalas e influyentes
+
+En el estudio previo, hemos identificado las empresas 7 y 100 como empresas anómolas y muy influyentes. Por tanto, las vamos a eliminar de nuestro *dataset* y vamos a repetir el ajuste del modelo.
+
+### Filtrado del *dataset*
+
+```{r}
+
+# Repito este calculo porque hemos usado la misma variable para detectar
+# anomalias con 2.0 en vez de con 2.5
+empresas_anomalas <- hatco[abs(residuos) > 2.5, ]$empresa
+
+# Filtramos el dataset
+hatcoclean <- hatco[hatco$empresa != empresas_anomalas, ]
+
+# Miramos que solo tengamos 98 filas en el dataset limpiado
+nrow(hatcoclean)
+```
+
+### Re-ajuste del modelo
+
+Ahora que ya hemos realizado el filtrado, volvemos a ajustar el modelo:
+
+```{r}
+mod2 <- lm(fidelidad~velocidad+precio+flexprec+imgfabri+servconj+imgfvent+calidadp, hatcoclean)
+mod2
+```
+
+### Estudio de la bondad del nuevo ajuste
+
+Repetimos los cálculos sobre la bondad del ajuste y contrastes de signifiación individuales para el nuevo ajuste logrado.
+
+
+Miramos la bondad del ajuste
+
+```{r }
+print(summary(mod2))
+```
+
+Notar que ahora tenemos un *adjusted* $R^2$ con un valor de $0.7975$. En la primer regresión obtuvimos un valor de $0.7578$ para esta métrica. Por tanto, parece que con este pequeño filtrado hemos mejorado notablemente los resultados de nuestro modelo.
+
+Realizamos el test ANOVA
+
+```{r }
+anovares <- anova(mod2)
+anovares
+```
+
+<!-- TODO -- todo lo que sigue es copiado de un apartado anterior. Hay que desarrollarlo para el nuevo modelo ->
+
+Usamos summary para ver si las percepciones son relevantes en la variable de salida:
+Viendo los p-valores que estan por debajo de 0.05, las unicas variables relevantes son (las que rechazan H0):
+
+- Flexprec
+- Servconj
+- Y ademas el parametro independiente $\beta_0$
+
+A un nivel de significación del 1%
+
+- Intercept ($\beta_0$) se rechaza pues su p-valor es $0.044 > 0.01$
