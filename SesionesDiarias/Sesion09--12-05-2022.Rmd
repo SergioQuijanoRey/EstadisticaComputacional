@@ -4,6 +4,10 @@ author:
   - Sergio Quijano Rey
   - sergioquijano@correo.ugr.es
 date: 12.05.2022
+output:
+    html_document:
+        toc: true
+        toc_depth: 3
 ---
 
 # Notas previas
@@ -80,6 +84,8 @@ Viendo los p-valores que estan por debajo de 0.05, las unicas variables relevant
 A un nivel de significación del 1%
 
 - Intercept ($\beta_0$) se rechaza pues su p-valor es $0.044 > 0.01$
+
+# Estudio del *dataset*
 
 ## Estudiamos la homocedasticidad
 
@@ -188,3 +194,129 @@ Hemos supuesto previamente la linealidad en la relación entre la respuesta y la
 # TODO -- descomentar cuando tenga instalada la libreria
 # library(car)
 ```
+
+## Identificación de datos anómalos
+
+Como datos anómalos identificamos aquellos datos cuyos residuos sean excesivamente grandes. Para ello, consideraremos los residuos estandarizados o estudentizados, y detectaremos datos anómalos aquellos cuyos residuos estén por encima del rango $(-2, 2)$, y excesivamente anómalos aquellos que estén por encima del rango $(-3, 3)$.
+
+A continuación, localizo las empresas con un residuo $|res_i| > 2.5$:
+
+```{r}
+# Selecciono aquellas filas que cumplen la condicion buscada
+empresas_anomalas <- hatco[abs(residuos) > 2.5, ]$empresa
+empresas_anomalas
+```
+
+Por tanto, vemos que tenemos dos empresas anómalas, la empresa con identificador 7 y la empresa con identificador 100. Repito lo anterior pero usando como umbral $2$ en vez de $2.5$:
+
+```{r}
+# Selecciono aquellas filas que cumplen la condicion buscada
+empresas_anomalas <- hatco[abs(residuos) > 2, ]$empresa
+empresas_anomalas
+```
+
+Con este criterio más suave (es más propenso a detectar anomalías), tenemos también las empresas 11 y 14 como empresas anómalas.
+
+## Identificación de datos influyentes
+
+Como datos influyentes identificamos aquellos que tienen un impacto desproporcionado sobre los resultados de la regresión. Si además se tratan de datos aislados, estos datos deberían ser tratados.
+
+Para identificar estos datos, usaremos la **distancia de Cook** $D_i$ que calcularemos usando `cooks.distance`. Realizamos dicho estudio y mostramos las distancias gráficamente:
+
+```{r}
+distancias <- cooks.distance(mod1)
+plot(
+     hatco$empresa, distancias,
+     main = "Distancia Cook de cada una de las empresas",
+     ylab = "Distancia Cook",
+     xlab = "Identificador de la empresa"
+)
+```
+
+En esta gráfica vemos que hay datos cuya distancia *Cook* (recordemos que mide la influencia que han tenido los datos en la regresión) es mucho más grande que el resto de datos. Especialmente uno hacia la izquierda (entre el 0 y el 20) y el valor 100. Sabemos que el 100 tiene un residuo demasiado elevado. Veamos si localizamos el otro dato, que sospechamos que es el 7 (por el previo estudio de residuos):
+
+```{r}
+empresas_distancias_anomalas <- hatco[distancias > 0.05, ]$empresa
+empresas_distancias_anomalas
+```
+
+Efectivamente, son las empresas que ya habíamos detectado como anómalas al estudiar sus residuos estandarizados. Por tanto, sabemos que estos datos que han sido demasiasdo influyentes en la regresión son datos anómalos. Esto puede ser negativo porque los valores anómalos pueden estar empeorando los resultados de la regresión.
+
+Todo este trabajo se simplifica bastante con la librería `car`. Mostramos cómo se usa a continuación:
+
+```{r}
+# TODO -- descomentar cuando consiga instalar la libreria
+# library(car)
+# influenceIndexPlot(mod1)
+```
+
+
+## Identificación de datos aislados
+
+Para medir el aislamiento de estos datos usaremos los valores de la diagonal de la matriz *hat*: $\hat{H} = X (X X')^{-1} X'$ que se puede obtener con la función `hatvalues`.
+
+Estudiamos dichos *hatvalues* y los mostramos gráficamente:
+
+```{r}
+hatvalues <- hatvalues(mod1)
+plot(
+    hatco$empresa, hatvalues,
+    main = "hatvalues de cada una de las empresas",
+    ylab = "hatvalue",
+    xlab = "Identificador de la empresa"
+)
+```
+
+Visualmente, identificamos dos empresas con *hatvalues* desproporcionados. Además, no se pueden tratar de las empresas 7 y 100. Veamos de qué empresas se tratan:
+
+```{r}
+empresas_hatvalues_anomalos <- hatco[hatvalues > 0.35, ]$empresa
+empresas_hatvalues_anomalos
+```
+
+Tenemos por tanto dos empresas que podrían necesitar de un estudio independiente, la 22 y la 55, por estar demasiado aisladas.
+
+Puedo mostrar gráficamente estas empresas que se han detectado como excesivamente aisladas:
+
+```{r}
+# Muestro graficamente estas empresas anomalas
+plot(
+    hatco$empresa, hatvalues,
+    main = "hatvalues de cada una de las empresas",
+    ylab = "hatvalue",
+    xlab = "Identificador de la empresa"
+)
+
+# pch = 21 es para que el circulo salga rellenado y no vacio
+points(empresas_hatvalues_anomalos, hatvalues[empresas_hatvalues_anomalos], col = "blue", pch = 19)
+```
+
+Veamos el residuo que tienen estos valores aislados:
+
+```{r}
+residuos_empresas_muy_influyentes <- residuos[empresas_hatvalues_anomalos]
+residuos_empresas_muy_influyentes
+```
+
+A simple vista no parece que tengamos un residuo muy grande. A pesar de estar aisladas, no parecen que tengan problemas con los residuos obtenidos por el modelo. De todas formas, podemos localizar estas empresas en un gráfico de residuos, en valor absoluto:
+
+```{r}
+# Muestro los residuos de todas las empresas
+plot(
+    hatco$empresa, abs(residuos),
+    main = "Residuo estandarizado absoluto de cada una de las empresas",
+    ylab = "Residuo",
+    xlab = "Identificador de la empresa"
+)
+
+# Ahora localizo las dos empresas que estamos estudiando
+# pch = 21 es para que el circulo salga rellenado y no vacio
+points(
+    empresas_hatvalues_anomalos, abs(residuos[empresas_hatvalues_anomalos]),
+    col = "blue", pch = 19
+)
+```
+
+Podemos observar que sus residuos son bajos en comparación al resto de empresas. Por tanto, no parece que sean datos problemáticos.
+
+## Eliminación de observaciones anómalas e influyentes
