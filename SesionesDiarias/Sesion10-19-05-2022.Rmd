@@ -1,0 +1,279 @@
+---
+title: Sesión de prácticas 10, Estadística Computacional
+author:
+  - Sergio Quijano Rey
+  - sergioquijano@correo.ugr.es
+date: 19.05.2022
+output:
+    html_document:
+        toc: true
+        toc_depth: 3
+        toc_float: true
+        collapsed: true
+        number_sections: true
+---
+
+# Tarea 1. Aproximación de una probabilidad
+
+Partimos de $X, Y \sim \mathcal{U}[-1, 1]^2$ y queremos calcular mediante una simulación la probabilidad $P(X + Y \leq 0)$.
+
+```{r}
+# Lanzamos 1000 simulaciones
+nsim<-1000
+set.seed(1)
+x<-runif(nsim,-1,1)
+y<-runif(nsim,-1,1)
+
+# Calculamos la aproximacion
+suceso<-(x+y<=0)
+mean(suceso)
+```
+
+Además, calcularemos el error y mostraremos el gráfico de convergencia:
+
+```{r}
+# Error de estimación
+sd(suceso)/sqrt(nsim)
+```
+
+```{r}
+estim<-cumsum(suceso)/(1:nsim)
+
+# errores de estimación correspondientes
+estim.err<-sqrt(cumsum((suceso-estim)^2))/(1:nsim)
+plot(
+    1:nsim,
+    estim,
+    type='l',
+    ylab='Aproximación y límites de error',
+    xlab='Número de simulaciones',
+    main=expression(P(X+Y<=0)),
+    ylim=c(0,1)
+)
+z<-qnorm(0.025,lower.tail = FALSE)
+lines(estim - z*estim.err,col='blue',lwd=2,lty=3)
+lines(estim + z*estim.err,col='blue',lwd=2,lty=3)
+```
+
+Podemos comparar con el valor exacto, que en este caso es $\frac{1}{2}$:
+
+```{r}
+exact_value <- 1/2
+abs_diff <- abs(exact_value - mean(suceso))
+abs_diff
+
+rel_diff <- abs_diff / exact_value * 100
+rel_diff
+```
+
+Repetimos el mismo experimento para $P(X^2 + Y^2 \leq 1)$, cuyo valor verdadero sabemos que es $\frac{\pi}{4}$. Empezamos de nuevo calculando la estimación:
+
+```{r}
+
+# Lanzamos 1000 simulaciones
+nsim <- 1000
+set.seed(1)
+x <- runif(nsim,-1,1)
+y <- runif(nsim,-1,1)
+
+# Calculamos la aproximacion
+suceso <- (x^2+ y^2 <= 1)
+approx_value <- mean(suceso)
+approx_value
+```
+
+Vemos el error cometido:
+
+```{r}
+# Error de estimación
+sd(suceso)/sqrt(nsim)
+```
+
+Y el gráfico de convergencia:
+
+```{r}
+estim<-cumsum(suceso)/(1:nsim)
+
+# errores de estimación correspondientes
+estim.err<-sqrt(cumsum((suceso-estim)^2))/(1:nsim)
+plot(
+    1:nsim,
+    estim,
+    type='l',
+    ylab='Aproximación y límites de error',
+    xlab='Número de simulaciones',
+    main=expression(P(X^2+Y^2<=1)),
+    ylim=c(0,1)
+)
+z<-qnorm(0.025,lower.tail = FALSE)
+lines(estim - z*estim.err,col='blue',lwd=2,lty=3)
+lines(estim + z*estim.err,col='blue',lwd=2,lty=3)
+```
+
+Comparamos con el valor real de la probabilidad:
+
+```{r}
+exact_value <- pi / 4.0
+abs_diff <- abs(exact_value - approx_value)
+abs_diff
+
+rel_diff <- abs_diff / exact_value * 100
+rel_diff
+```
+
+Con esto podemos ver que ambas simulaciones de la probabilidad nos dan resultados satisfactorios.
+
+# Tarea 2. Aproximación de una integral
+
+Partimos de la función $f(x)$ función de densidad de una distribución Beta con parámetros $a = 2.5, b = 5$ y las dos integrales que se indican en el enunciado.
+
+## Gráficos de las funciones a integrar
+
+Mostramos en los siguientes gráficos las dos funciones que vamos a integrar:
+
+```{r}
+# primera integral
+f1<-function(x) dbeta(x,2.5,5)
+curve(f1(x),0.2,0.4)
+
+# segunda integral
+f2<-function(x) sin(x)*exp(-x)*dbeta(x,2.5,5)
+curve(f2(x),0,1)
+```
+
+## Cálculo aproximado mediante simulaciones de la integral
+
+Ahora realizamos la aproximación de la integral usando simulaciones.
+
+### Primera integral
+
+Para la primera integral usamos **integración Monte Carlo clásica**, en un intervalo que no sea $(0, 1)$:
+
+```{r}
+# Establecemos las condiciones de la simulacion
+set.seed(1)
+nsim <- 1000
+
+# Limites de la integral
+lower <- 0.2
+upper <- 0.4
+
+# Funcion que vamos a integrar
+f <- function(x) dbeta(x, 2.5, 5)
+
+# Muestreo de una uniforme U(a, b)
+x_values <- runif(nsim, lower, upper)
+
+# Ahora calculo la aproximacion de la integral
+approx_int <- (upper - lower) / nsim * sum(f(x_values))
+approx_int
+```
+
+Veamos ahora el gráfico de convergencia:
+
+```{r}
+# Condiciones de la simulacion
+nsim <- 1000
+set.seed(1)
+
+# Realizamos el muestreo de valores y mapeo por la funcion
+x_values <- runif(nsim, lower, upper)
+fx <- sapply(x_values, f)
+
+# Aproximaciones para $n=1,...,nsim$
+estim <- ((upper - lower) / (1:nsim)) * cumsum(fx)
+
+# errores de estimación correspondientes
+estim.err <- sqrt(cumsum((fx-estim)^2))/(1:nsim)
+plot(1:nsim,estim,type='l',ylab='Aproximación y límites de error',xlab='Número de simulaciones')
+z<-qnorm(0.025,lower.tail = FALSE)
+lines(estim - z*estim.err,col='blue',lwd=2,lty=3)
+lines(estim + z*estim.err,col='blue',lwd=2,lty=3)
+abline(h = approx_int,col=2)
+
+# Aproximación final y su error
+estim[nsim]
+estim.err[nsim]
+```
+
+### Segunda Integral
+
+Para la segunda integral tenemos que usar **integral con límites infinitos**. Para ello, tenemos que descomponer la función de la integral en el producto de una función que multiplica a una función que sea función de densidad. En nuestro caso es claro que tenemos que hacer:
+
+- $f(x) = dbeta(x, 2.5, 5)$
+- $c(x) = sin(x) e^{-x}$
+
+```{r}
+# Establecemos las condiciones de la simulacion
+set.seed(1)
+nsim <- 1000
+
+# Descomposicion de las funciones
+# La funcion f no la ponemos, porque es de la que vamos a muestrear
+c <- function(x) sin(x) * exp(-x)
+
+# Muestreo aleatorio desde la distribucion dada por f
+x_values <- rbeta(nsim, 2.5, 5)
+
+# Aproximamos la integral, primero mapeando y luego ponderando
+c_values <- c(x_values)
+second_approx_int <- sum(c_values) / nsim
+second_approx_int
+```
+
+Ahora calculamos el error de la aproximación y mostramos el gráfico de convergencia:
+
+```{r}
+# Condiciones de la simulacion
+nsim <- 1000
+set.seed(1)
+
+# Descomposicion de las funciones
+# La funcion f no la ponemos, porque es de la que vamos a muestrear
+c <- function(x) sin(x) * exp(-x)
+
+# Realizamos el muestreo de valores y mapeo por la funcion
+x_values <- rbeta(nsim, 2.5, 5)
+fx <- sapply(x_values, c)
+
+# Aproximaciones para $n=1,...,nsim$
+estim <-  cumsum(fx) / (1:nsim)
+
+# errores de estimación correspondientes
+estim.err <- sqrt(cumsum((fx-estim)^2))/(1:nsim)
+plot(1:nsim,estim,type='l',ylab='Aproximación y límites de error',xlab='Número de simulaciones')
+z<-qnorm(0.025,lower.tail = FALSE)
+lines(estim - z*estim.err,col='blue',lwd=2,lty=3)
+lines(estim + z*estim.err,col='blue',lwd=2,lty=3)
+abline(h = second_approx_int,col=2)
+
+# Aproximación final y su error
+estim[nsim]
+estim.err[nsim]
+```
+
+## Comparación con los valores verdaderos de la integral
+
+Aparentemente ambas aproximaciones han sido buenas. Veamos ahora si esto es verdad comparando con los verdaderos valores de la integral.
+
+### Comparación con la primera integral
+
+Calculamos el verdadero valor de la primera integral:
+
+```{r}
+f1 <- function(x) dbeta(x,2.5,5)
+real_int <- integrate(f1,0.2,0.4)
+real_int
+```
+
+Comparamos con nuestra aproximación:
+
+```{r}
+# Falla y no se por que
+
+# abs_err <- abs(real_int$value - approx_int)
+# abs_err
+#
+# rel_err <- abs_err / real_int * 100
+# rel_err
+```
