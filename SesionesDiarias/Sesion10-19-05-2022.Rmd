@@ -269,11 +269,146 @@ real_int
 Comparamos con nuestra aproximación:
 
 ```{r}
-# Falla y no se por que
+abs_err <- abs(real_int$value - approx_int)
+abs_err
 
-# abs_err <- abs(real_int$value - approx_int)
-# abs_err
-#
-# rel_err <- abs_err / real_int * 100
-# rel_err
+rel_err <- abs_err / real_int$value * 100
+rel_err
+```
+
+Podemos ver que, en el caso de la primera aproximación, el resultado es satisfactorio. Además, obtenemos un error menor que la estimación del error realizada en apartados anteriores.
+
+### Comparación con la segunda integral
+
+Calculamos el verdadero valor de la segunda integral:
+
+```{r}
+f2 <- function(x) sin(x) * exp(-x) * dbeta(x, 2.5, 5)
+real_int <- integrate(f2, -Inf, Inf)
+real_int
+```
+
+Comparamos con nuestra aproximación:
+
+```{r}
+abs_err <- abs(real_int$value - second_approx_int)
+abs_err
+
+rel_err <- abs_err / real_int$value * 100
+rel_err
+```
+
+De nuevo, vemos que la aproximación es satisfactoria. Además, el error real es menor que el error que hemos estimado en apartados anteriores.
+
+# Tarea 3. Aproximación de una distribución de probabilidad
+
+Buscamos aproximar una distribución de *Poisson* compuesta:
+
+$$S_N = \sum_{i = 1}^N X_i$$
+
+donde $N \sim \mathcal{P}(N)$ y $X_1, \ldots, X_N$ son variables aleatorias *iid*.
+
+Además, tenemos que:
+
+$$\mathbb{E}[S_N] = \mathbb{E}[N] \cdot \mathbb{E}[X_1]$$
+$$\mathbb{Var}[S_N] = \mathbb{E}[N] \cdot \mathbb{Var}[X_1] + \mathbb{Var}[N] \cdot \mathbb{E}[X_1]^2$$
+
+En lo que sigue, suponemos que $\lambda = 17$ y que $X_i \sim lognorm(\mu = 3.5, \sigma = 1.1)$.
+
+Con esto, podemos calcular de forma exacta la media y varianza de la distribución compuesta:
+
+```{r}
+# Parámetros de la lognormal (X)
+mu <- 3.5
+sig <- 1.1
+
+# A partir de ellos calculamos E[X] y V(X)
+EX<- exp(mu+sig^2/2)
+EX
+VX<- EX^2*(exp(sig^2)-1)
+VX
+
+# Parámetro de la Poisson (N)
+lam<- 17 # coincide con E[N] y V(N)
+
+# Media de la Poisson compuesta
+ES<-lam*EX
+ES
+
+# Varianza de la Poisson compuesta
+VS<- lam*VX + lam*EX^2
+VS
+```
+
+Ahora, buscamos aproximar la distribución de probabilidad tomando $n$ muestras aleatorias de la distribución. La función de densidad se puede aproximar por el histograma que generemos de las $n$ muestras de la distribución:
+
+```{r}
+# Numero de simulaciones que vamos a tomar
+nsim <- 5000
+
+# Simulamos ahora nsim valores de S_N:
+S <- double(nsim) # Para almacenar los valores simulados
+set.seed(1)
+
+for (i in 1:nsim) {
+    n <- rpois(1, lam)
+    if (n > 0) S[i] <- sum(rlnorm(n, mu, sig))
+}
+
+# El vector S contiene los valores simulados de S_N
+# un histograma de S nos da una aproximación de la distribución
+# Cambio el codigo dado en el guion de practicas porque me daba un error
+hist(S, breaks = 20, prob = TRUE)
+
+# Podemos superponer la densidad suavizada que calcula density()
+lines(density(S), col = "red")
+```
+
+Ahora calculo la media y varianza de los valores generados, que nos aproximarán la media y varianza reales:
+
+```{r}
+exper_mean <- mean(S)
+exper_mean
+
+exper_var <- var(S)
+exper_var
+```
+
+Veamos **cómo de parecidos** son respecto los valores reales de estas métricas, empezando por la media:
+
+```{r}
+abs_err <- abs(ES - exper_mean)
+abs_err
+
+rel_err <- abs_err / ES * 100
+rel_err
+```
+
+Repetimos lo mismo pero para la varianza:
+
+```{r}
+abs_err <- abs(VS - exper_var)
+abs_err
+
+rel_err <- abs_err / VS * 100
+rel_err
+```
+
+Por lo tanto:
+
+- La media tiene un error relativo de aproximadamente $0.2\%$, y la varianza de $1.73\%$
+- En ambos casos, podemos pensar que hemos obtenido un resultado satisfactorio
+
+Ahora, con las simulaciones de la distribución, podemos calcular el **Value at Risk** como el cuantil 99.5%:
+
+```{r}
+value_at_risk <- quantile(S, 0.995)
+value_at_risk
+```
+
+Comparamos con el **Value at Risk** que nos daría una aproximación normal, usando la media y varianza:
+
+```{r}
+# aproximación por una Normal con media ES y varianza VS
+qnorm(0.995, mean=ES, sd=sqrt(VS))
 ```
