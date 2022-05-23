@@ -1,0 +1,197 @@
+---
+title: Sesión de prácticas 7, Estadística Computacional
+author:
+  - Sergio Quijano Rey
+  - sergioquijano@correo.ugr.es
+date: 28.04.2022
+output:
+    html_document:
+        toc: true
+        toc_depth: 3
+        toc_float: false
+        collapsed: true
+        number_sections: true
+---
+
+# Ejercicio 1
+
+## Carga de los datos
+
+Comenzamos cargando los datos con los que vamos a trabajar:
+
+```{r}
+employees <- read.table("Employee.txt", header = TRUE, sep = " ", as.is = NA)
+```
+
+Mostramos la estructura de los datos cargados:
+
+```{r}
+str(employees)
+```
+
+Ahora pondremos nombre a los factores, usando la instrucción `within`:
+
+```{r}
+employees <- within(employees, {
+    gender <- factor(gender, labels = c("female", "male"))
+})
+str(employees)
+```
+
+Simplicamos el código haciendo un `attach` del *dataframe*. Con esto, podemos usar `gender` en vez de `employees$gender`:
+
+```{r}
+attach(employees)
+```
+
+## Variables cuantitativas. Resúmenes y gráficos
+
+Podemos identificar como variables cuantitativas: `salary`, `startsal`, `age`, `jobtime`, `prevexp` y `edu`. Por su naturaleza podríamos considerar las dos primeras como continuas y resto como discretas. Aunque tenemos que tener en cuenta que todas las variables se han medido de forma discreta. Esto es relevante a la hora de analizar los datos.
+
+Empezamos mostrando un histograma básico del salario (que es una variable continua):
+
+```{r}
+hist(salary)
+```
+
+Mostramos los metadatos del histograma:
+
+```{r}
+res <- hist(salary, plot = FALSE)
+res
+```
+
+Vemos que por defecto, tenemos pocos intervalos para la naturaleza continua de nuestros datos. Es por ello que ahora hacemos un histograma más avanzado. Para ello, usamos el parámetro `breaks`, especificasndo el número de intervalos que queremos mostrar:
+
+```{r}
+hist(salary, breaks = 100)
+```
+
+También podemos hacer el histograma definiendo, en `breaks`, los puntos de corte con distinta amplitud, usando una lista:
+
+```{r}
+x1 <- seq(15000, 40000, by = 5000)
+x2 <- seq(50000, 80000, by = 10000)
+x3 <- seq(100000, 140000, by = 20000)
+hist(salary, breaks = c(x1, x2, x3))
+```
+
+Observar que cuando hacemos un gráfico de barras, con distintas amplitudes en las barras, obtenemos como altura de las barras la densidad de frecuencia (frecuencia dividida por la amplitud).
+
+# Histograma con distribucion superpuesta
+message("Histograma con distribucion superpuesta")
+hist(salary,breaks=c(x1,x2,x3))
+lines(density(salary),col='blue')
+message("")
+
+# Sobre gráfico anterior dibuja también la función de densidad de una Normal cuya media
+# y desviación típica sean las de los datos de salary. ¾Te parece que este podría ser un
+# buen modelo de probabilidad para describir estos datos?
+message("Histograma con distribucion normal superpuesta")
+distribucion <- dnorm(salary, mean = mean(salary), sd = sd(salary))
+hist(salary, breaks = c(x1, x2, x3))
+curve(dnorm(x, mean = mean(salary), sd = sd(salary)), col = 'blue', add = TRUE)
+message("")
+
+# No parece un buen modelo. No se ajusta bien a los datos, como comprobamos visualmente.
+
+message("Grafica qqnorm:")
+qqnorm(salary)
+message("")
+
+message("Test de kolmogorov")
+ks.test(salary,pnorm,mean=mean(salary),sd=sd(salary))
+message("")
+
+message("Test de Shapiro")
+shapiro.test(salary)
+message("")
+
+message("Grafico boxplot")
+boxplot(salary)
+message("")
+
+message("Resumen de la variable salary")
+print(summary(salary))
+message("")
+
+message("Grafico combinado:")
+hist(salary,probability=TRUE,main="",axes=FALSE)
+axis(1)
+lines(density(salary),col='red',lwd=2)
+par(new=TRUE) ## Para que el próximo gráfico se superponga al anterior
+boxplot(salary,horizontal=TRUE, axes=FALSE,lwd=2)
+message("")
+
+message("Graficos comparando salarios, generio, minorias y categoria de trabajo")
+boxplot(salary~gender)
+boxplot(salary~minority)
+boxplot(salary~jobcat)
+# A continuación salario con una doble clasificación
+boxplot(salary~gender*jobcat)
+message("Algunas conclusiones")
+message("\tLos hombres comienzan con un salario mayor que las mujeres")
+message("\tPersonas que no pertenecen a una minoria comienzan con un salario mayor que aquellas personas que si pertenecen")
+message("\tManager es el puesto con mayor salario inicial, seguido por guarda de seguridad, y en ultimo lugar 'clerical'")
+message("\tSigue siendo clara la brecha salarial por genero cuando separamos por genero y puesto de trabajo")
+message("\tAdemas, vemos que no hay mujeres en el puesto 'custodial'")
+message("")
+
+# Realiza un análisis similar con las variables startsal y age.
+message("Ahora comparamos startsal con las variables anteriores")
+boxplot(startsal~gender)
+boxplot(startsal~minority)
+boxplot(startsal~jobcat)
+boxplot(startsal~gender*jobcat)
+message("")
+boxplot(age~gender)
+boxplot(age~minority)
+boxplot(age~jobcat)
+boxplot(age~gender*jobcat)
+message("Algunas conclusiones")
+message("\tLa mediana de edad de las mujeres es menor que la de los hombres, pero las mujeres presentan una mayor variedad en la edad")
+message("\tLas personas que no pertenecen a una minoria presentan una mediana de edad mucho mas bajas que las que si pertenecen")
+message("\tAdemas, la distribucion de las personas que pertenecen a una minoria es mucho mas simetrica")
+message("\tLas personas 'custodial' son mayores que los otros dos puestos de trabajo")
+message("\tLas mujeres manager son mas jovenes que los hombres manager, y con menos rango en la edad")
+message("\tLas mujeres 'clerical' tienen una mediana de edad parecida a los hombres 'clerical', pero presentan muchisima mas variedad en la edad")
+message("")
+
+message("Diagrama de dispersion de sal y startsal")
+plot(startsal,salary)
+message("")
+
+message("Regresion lineal entre salary y startsal")
+mod<-lm(salary~startsal)
+plot(startsal,salary)
+abline(mod,col='blue')
+message("Resultado de la regresion")
+print(mod)
+message("")
+
+# Realiza un estudio similar que permita descubrir una posible relación entre: (i) las va-
+# riables salary y age; y (ii) las variables salary y edu. ¾Qué puedes interpretar de los
+# grácos?
+
+message("Repetimos el estudio para salary y age")
+mod<-lm(salary~age)
+plot(age,salary)
+abline(mod,col='blue')
+message("Resultado de la regresion")
+print(mod)
+message("Conclusiones:")
+message("\tCada año que pasa parece que se pierden ~200$")
+message("\tSin embargo, no parece que haya mucha correlacion (por lo que muestra el grafico, no calculamos coeficientes)")
+message("")
+
+message("Repetimos el estudio para salary y educacion")
+mod<-lm(salary~edu)
+plot(edu,salary)
+abline(mod,col='blue')
+message("Resultado de la regresion")
+print(mod)
+message("Conclusiones:")
+message("\tConforme aumenta el valor de la educacion, aumenta el salario notablemente")
+message("\tEsto tiene logica si en los datos un mayor valor del factor 'edu' corresponde a una educacion mayor")
+message("")
+
