@@ -78,120 +78,211 @@ hist(salary, breaks = c(x1, x2, x3))
 
 Observar que cuando hacemos un gráfico de barras, con distintas amplitudes en las barras, obtenemos como altura de las barras la densidad de frecuencia (frecuencia dividida por la amplitud).
 
-# Histograma con distribucion superpuesta
-message("Histograma con distribucion superpuesta")
+Un histograma nos da una representación de la distribución de frecuencias y consiste además en un estimador (no paramétrico) de la función de densidad de la variable. Una versión suavizada de este estimador se puede obtener usando la función `density`, que podemos superponer al histograma usando la función `lines`:
+
+```{r}
 hist(salary,breaks=c(x1,x2,x3))
 lines(density(salary),col='blue')
-message("")
+```
 
-# Sobre gráfico anterior dibuja también la función de densidad de una Normal cuya media
-# y desviación típica sean las de los datos de salary. ¾Te parece que este podría ser un
-# buen modelo de probabilidad para describir estos datos?
-message("Histograma con distribucion normal superpuesta")
+Sobre el gráfico anterior dibujo la función de densidad de una normal, cuya media y desviación típica sean la de los datos de `salary`.
+
+```{r}
 distribucion <- dnorm(salary, mean = mean(salary), sd = sd(salary))
 hist(salary, breaks = c(x1, x2, x3))
 curve(dnorm(x, mean = mean(salary), sd = sd(salary)), col = 'blue', add = TRUE)
-message("")
+```
 
-# No parece un buen modelo. No se ajusta bien a los datos, como comprobamos visualmente.
+No parece que sea un buen modelo de probabilidad para los datos, no se ajusta a la distribución que visualizamos con el histograma.
 
-message("Grafica qqnorm:")
+Podemos comprobar esto mismo con un gráfico más adecuado, el **gráfico probabilístico normal**, que es un caso particular de los gráficos **cuantil-cuantil**. Mostramos el gráfico probabilístico normal, en el que mostramos los cuantiles de nuestra distribución frente a los cuantiles de una distribución normal:
+
+```{r}
 qqnorm(salary)
-message("")
+```
 
-message("Test de kolmogorov")
+Aquí vemos con claridad que no tenemos una línea recta, que es lo que se espera si los datos se distribuyen por una distribución normal. Esto se debe a que la cola izquierda de la distribución es mucho más corta que la cola derecha, que sí se parece más a la cola de una normal.
+
+Para confirmar esto, plantearemos un test de hipótesis:
+
+- $H_0$: la variable salario sigue una distribució normal
+- $H_1$: la variable salario sigue otra distribución, no normal
+
+Para plantear el contraste usaremos el test *"kolmogorov-Smirnov"* y *"Shapiro-Wilks"*. Empezamos con el test de kolmogorov-Smirnov:
+
+```{r}
 ks.test(salary,pnorm,mean=mean(salary),sd=sd(salary))
-message("")
+```
 
-message("Test de Shapiro")
+Ahora, vamos con el de Shapiro-Wils:
+
+```{r}
 shapiro.test(salary)
-message("")
+```
 
-message("Grafico boxplot")
+De estos dos tests, podemos **concluir** que, como el $p-value$ es muy pequeño, rechazamos $H_0$, luego los datos no siguen una distribución de probabilidad normal.
+
+Notar que el primer test nos muestra un *warning*: hay *ties* (valores repetidos) en los datos de `salary`. Esto no tiene sentido al ser una variable continua, pero hay que recordar la discretización que hemos realizado.
+
+Ahora, hacemos un gráfico *boxplot* de la variable `salary`. Son unos gráficos muy útiles para explorar las distribuciones de probabilidad de variables continuas.
+
+```{r}
 boxplot(salary)
-message("")
+```
 
-message("Resumen de la variable salary")
-print(summary(salary))
-message("")
+Vemos con este gráfico que los datos pueden tener muchos *outliers* en la cola derecha de la distribución. Acompañamos este gráfico con el `sumary` de la variable, para localizar la mediana y cuartiles:
 
-message("Grafico combinado:")
+```{r}
+summary(salary)
+```
+
+Realizamos ahora un gráfico combinado, mostrando el histograma junto al gráfico de bigotes. Con esto dejamos claro que la variable no sigue una distribución normal:
+
+```{r}
 hist(salary,probability=TRUE,main="",axes=FALSE)
 axis(1)
 lines(density(salary),col='red',lwd=2)
 par(new=TRUE) ## Para que el próximo gráfico se superponga al anterior
 boxplot(salary,horizontal=TRUE, axes=FALSE,lwd=2)
-message("")
+```
 
-message("Graficos comparando salarios, generio, minorias y categoria de trabajo")
+Ahora, usaremos un gráfico de cajas para comparar los salarios según la división que introducen otras variables, como el género, la minoría o la categoría de trabajo:
+
+```{r}
 boxplot(salary~gender)
 boxplot(salary~minority)
 boxplot(salary~jobcat)
+
 # A continuación salario con una doble clasificación
 boxplot(salary~gender*jobcat)
-message("Algunas conclusiones")
-message("\tLos hombres comienzan con un salario mayor que las mujeres")
-message("\tPersonas que no pertenecen a una minoria comienzan con un salario mayor que aquellas personas que si pertenecen")
-message("\tManager es el puesto con mayor salario inicial, seguido por guarda de seguridad, y en ultimo lugar 'clerical'")
-message("\tSigue siendo clara la brecha salarial por genero cuando separamos por genero y puesto de trabajo")
-message("\tAdemas, vemos que no hay mujeres en el puesto 'custodial'")
-message("")
+```
 
-# Realiza un análisis similar con las variables startsal y age.
-message("Ahora comparamos startsal con las variables anteriores")
+Algunas conclusiones:
+
+- El salario de las mujeres es mucho menor que el de los hombres
+- El salario de las minorías es algo menor que el de las no minorías
+- Las diferencias de salario entre mujeres y hombres se mantiene si nos fijamos en los puestos de trabajo
+
+Repetimos el análisis para la variable `startsal`:
+
+```{r}
 boxplot(startsal~gender)
 boxplot(startsal~minority)
 boxplot(startsal~jobcat)
 boxplot(startsal~gender*jobcat)
-message("")
+```
+
+Algunas conclusiones
+
+- Los hombres comienzan con un salario mayor que las mujeres
+- Personas que no pertenecen a una minoria comienzan con un salario mayor que aquellas personas que si pertenecen
+- Manager es el puesto con mayor salario inicial, seguido por guarda de seguridad, y en ultimo lugar 'clerical'
+- Sigue siendo clara la brecha salarial por genero cuando separamos por genero y puesto de trabajo
+- Ademas, vemos que no hay mujeres en el puesto 'custodial'
+
+Repetimos el análisis para la variable `age`:
+
+```{r}
 boxplot(age~gender)
 boxplot(age~minority)
 boxplot(age~jobcat)
 boxplot(age~gender*jobcat)
-message("Algunas conclusiones")
-message("\tLa mediana de edad de las mujeres es menor que la de los hombres, pero las mujeres presentan una mayor variedad en la edad")
-message("\tLas personas que no pertenecen a una minoria presentan una mediana de edad mucho mas bajas que las que si pertenecen")
-message("\tAdemas, la distribucion de las personas que pertenecen a una minoria es mucho mas simetrica")
-message("\tLas personas 'custodial' son mayores que los otros dos puestos de trabajo")
-message("\tLas mujeres manager son mas jovenes que los hombres manager, y con menos rango en la edad")
-message("\tLas mujeres 'clerical' tienen una mediana de edad parecida a los hombres 'clerical', pero presentan muchisima mas variedad en la edad")
-message("")
+```
 
-message("Diagrama de dispersion de sal y startsal")
+Algunas conclusiones
+
+- La mediana de edad de las mujeres es menor que la de los hombres, pero las mujeres presentan una mayor variedad en la edad
+- Las personas que no pertenecen a una minoria presentan una mediana de edad mucho mas bajas que las que si pertenecen
+- Ademas, la distribucion de las personas que pertenecen a una minoria es mucho mas simetrica
+- Las personas 'custodial' son mayores que los otros dos puestos de trabajo
+- Las mujeres manager son mas jovenes que los hombres manager, y con menos rango en la edad
+- Las mujeres 'clerical' tienen una mediana de edad parecida a los hombres 'clerical', pero presentan muchisima mas variedad en la edad
+
+# Análisis conjunto de dos variables
+
+## Análisis conjunto de dos variables: `salary` y `startsal`
+
+Vamos a analizar las posibles relaciones entre el salario actual y el salario inicial. Hacemos esto con un gráfico de dispersión para estas dos variables:
+
+```{r}
 plot(startsal,salary)
-message("")
+```
 
-message("Regresion lineal entre salary y startsal")
-mod<-lm(salary~startsal)
-plot(startsal,salary)
-abline(mod,col='blue')
-message("Resultado de la regresion")
-print(mod)
-message("")
+Con este gráfico, podemos pensar que existe una fuerte relación lineal entre las dos variables. Por eso, plantearemos un modelo de regresión lineal del tipo $salary = \beta_0 + \beta_1 \cdot startsal + \epsilon$. Comenzamos realizando el ajuste y mostrando los resultados:
 
-# Realiza un estudio similar que permita descubrir una posible relación entre: (i) las va-
-# riables salary y age; y (ii) las variables salary y edu. ¾Qué puedes interpretar de los
-# grácos?
+```{r}
+mod <- lm(salary~startsal)
+mod
+```
 
-message("Repetimos el estudio para salary y age")
+Mostramos ahora gráficamente el resultado de la regresión:
+
+```{r}
+plot(startsal, salary)
+abline(mod, col = "blue")
+```
+
+Veo ahora, con `summary`, la calidad de la regresión realizada:
+
+```{r}
+summary(mod)
+```
+
+Con un $R^-2$ ajustado de $0.7744$, podemos pensar que la relación lineal es lo suficientemente fuerte como para considerarse.
+
+## Análisis conjunto de dos variables: `salary` y `age`
+
+De nuevo, realizamos el ajuste y mostramos los resultados:
+
+```{r}
 mod<-lm(salary~age)
-plot(age,salary)
-abline(mod,col='blue')
-message("Resultado de la regresion")
-print(mod)
-message("Conclusiones:")
-message("\tCada año que pasa parece que se pierden ~200$")
-message("\tSin embargo, no parece que haya mucha correlacion (por lo que muestra el grafico, no calculamos coeficientes)")
-message("")
+mod
+```
 
-message("Repetimos el estudio para salary y educacion")
-mod<-lm(salary~edu)
-plot(edu,salary)
-abline(mod,col='blue')
-message("Resultado de la regresion")
-print(mod)
-message("Conclusiones:")
-message("\tConforme aumenta el valor de la educacion, aumenta el salario notablemente")
-message("\tEsto tiene logica si en los datos un mayor valor del factor 'edu' corresponde a una educacion mayor")
-message("")
+Mostramos gráficamente el ajuste realizado:
+
+```{r}
+plot(age, salary)
+abline(mod, col = 'blue')
+```
+
+Veamos la calidad del ajuste realizado:
+
+```{r}
+summary(mod)
+```
+
+**Conclusiones**:
+
+- Cada año que pasa parece que se pierden ~200$
+- Sin embargo, no parece que haya mucha correlacion (por lo que muestra el grafico)
+- De hecho, el valor de $R^2$ es muy pequeño, por lo que no podemos considerar la relación lineal
+
+## Análisis conjunto de dos variables: `salary` y `education`
+
+Empezamos realizando el ajuste y mostrando el resultado:
+
+```{r}
+mod <- lm(salary~edu)
+mod
+```
+
+Ahora mostramos gráficamente el ajuste realizado:
+
+```{r}
+plot(edu, salary)
+abline(mod, col = 'blue')
+```
+
+Y veamos la calidad del ajuste realizado:
+
+```{r}
+summary(mod)
+```
+
+**Conclusiones**:
+
+- Conforme aumenta el valor de la educacion, aumenta el salario notablemente
+- Esto tiene logica si en los datos un mayor valor del factor 'edu' corresponde a una educacion mayor
+- El valor de $R^2$ no es muy alto, pero tampoco es muy bajo. Por tanto, aunque no podamos usar esta regresión con fines predictivos, sí que nos sirve para relacionar las variables como lo hemos hecho previamente (mayor educación $\Rightarrow$ mayor salario)
 
