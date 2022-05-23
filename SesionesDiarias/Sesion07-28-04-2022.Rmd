@@ -286,3 +286,45 @@ summary(mod)
 - Esto tiene logica si en los datos un mayor valor del factor 'edu' corresponde a una educacion mayor
 - El valor de $R^2$ no es muy alto, pero tampoco es muy bajo. Por tanto, aunque no podamos usar esta regresión con fines predictivos, sí que nos sirve para relacionar las variables como lo hemos hecho previamente (mayor educación $\Rightarrow$ mayor salario)
 
+
+# Variables cualitativas: tablas de frecuencias y gráficos
+
+Las variables cualitativas, en formato factor, de nuestro dataset, son:
+
+- `gender`
+- `jobcat`
+- `minority`
+
+Podemos construir tablas de frecuencias (absolutas con `table` o relativas con `prop.table`) unidimensionales. Mostramos estas tablas para `jobcat`.
+
+Frecuencias absolutas:
+
+```{r}
+tab <- table(jobcat)
+tab
+```
+
+Frecuencias relativas:
+
+```{r}
+tab.fi <- prop.table(tab)
+tab.fi
+```
+
+También podemos construir una tabla clásica de frecuencias:
+
+```{r}
+data.frame(tab, Freq.rel = as.numeric(tab.fi))
+```
+
+Podemos hacer gráficos de barras y de sectores. Por ejemplo para la variable `jobcat`, empezando por el gráfico de barras:
+
+```{r}
+barplot(tab)
+```
+
+Y ahora con el gráfico de sectores:
+
+```{r}
+pie(tab)
+```
