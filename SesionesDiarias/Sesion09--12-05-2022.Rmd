@@ -1,5 +1,6 @@
 ---
-title: Sesión de prácticas 9, Estadística Computacional
+title: Sesión de prácticas 9, Estadística Computacional \n
+subtitle: Informe estadístico y regresión lineal múltiple
 author:
   - Sergio Quijano Rey
   - sergioquijano@correo.ugr.es
@@ -8,7 +9,7 @@ output:
     html_document:
         toc: true
         toc_depth: 3
-        toc_float: true
+        toc_float: false
         collapsed: true
         number_sections: true
 ---
@@ -75,16 +76,9 @@ Miramos la bondad del ajuste
 print(summary(mod1))
 ```
 
-Realizamos el test ANOVA
+De este `summary`, podemos ver que el valor ajustado de $R^2$ es de $0.7578$. Por tanto el ajuste lineal no es perfecto pero es suficientemente bueno como para seguir con el estudio.
 
-```{r }
-anovares <- anova(mod1)
-anovares
-```
-Usamos summary para ver si las percepciones son relevantes en la variable de salida:
-Viendo los p-valores que estan por debajo de 0.05, las unicas variables relevantes son (las que rechazan H0):
-
-<!-- TODO -- Aqui no estoy usando para nada el test ANOVA, creo que solo estoy usando el summary del mod1 -->
+Usamos `summary` para ver si las percepciones son relevantes en la variable de salida. Viendo los p-valores que estan por debajo de 0.05, las unicas variables relevantes son (las que rechazan H0):
 
 - Flexprec
 - Servconj
@@ -94,7 +88,30 @@ A un nivel de significación del 1%
 
 - Intercept ($\beta_0$) se rechaza pues su p-valor es $0.044 > 0.01$
 
-# Estudio del *dataset*
+Realizamos el test ANOVA
+
+```{r }
+anovares <- anova(mod1)
+anovares
+```
+
+Vemos que las variables que sirven para explicar la varianza del conjunto de datos son:
+
+- velocidad
+- precio
+- flexprec
+- imgfabri
+- En mucha menor medida, servconj
+
+Las variables que más variabilidad explican (en orden descendente) son:
+
+1. velocidad
+2. flexprec
+3. precio
+
+Las siguientes variables explican muchísimo menos la variabilidad del conjunto de datos.
+
+# Diagnóstico del modelo
 
 ## Estudiamos la homocedasticidad
 
@@ -369,6 +386,15 @@ print(summary(mod2))
 
 Notar que ahora tenemos un *adjusted* $R^2$ con un valor de $0.7975$. En la primer regresión obtuvimos un valor de $0.7578$ para esta métrica. Por tanto, parece que con este pequeño filtrado hemos mejorado notablemente los resultados de nuestro modelo.
 
+Veamos qué variables son relevantes para determinar la variable de salida. Viendo los p-valores que estan por debajo de 0.05, las unicas variables relevantes son (las que rechazan H0):
+
+- `flexprec`
+- `servconj`
+- `imgfvent`
+- Y ademas el parametro independiente $\beta_0$
+
+Respecto al ajuste anterior, tenemos las mismas variables relevantes, a la que se suma `imgfvent`. Por tanto, al hacer la limpieza hacemos que la variable `imgfvent` gane relevancia en el ajuste.
+
 Realizamos el test ANOVA
 
 ```{r }
@@ -376,15 +402,65 @@ anovares <- anova(mod2)
 anovares
 ```
 
-<!-- TODO -- todo lo que sigue es copiado de un apartado anterior. Hay que desarrollarlo para el nuevo modelo ->
+De esto, sacamos las siguientes **conclusiones**:
 
-Usamos summary para ver si las percepciones son relevantes en la variable de salida:
-Viendo los p-valores que estan por debajo de 0.05, las unicas variables relevantes son (las que rechazan H0):
+- Todas las variables, salvo `calidadp`, sirven de forma significativa para explicar la varianza del conjunto de datos
+- Las variables que más varianza explican, ordenadas de mayor a menor varianza explicada, son:
+    1. Velocidad
+    2. `flexprec`
+    3. `precio`
+- Las siguientes variables explican en muchísima menor medida la varianza que las tres primeras variables que acabamos de comentar
 
-- Flexprec
-- Servconj
-- Y ademas el parametro independiente $\beta_0$
+> En lo que sigue, vamos a usar el nuevo modelo ajustado como modelo principal
 
-A un nivel de significación del 1%
+## Estudio de la multicolinealidad
 
-- Intercept ($\beta_0$) se rechaza pues su p-valor es $0.044 > 0.01$
+Con los contrastes de significación individual de cada percepción $x_j$, hemos visto que hay variables redundantes en el modelo. Es importante que confirmemos que esto supone un problema serio de multicolinealidad. Para descartar la existencia de multicolinealidad seguimos los siguientes pasos:
+
+1. Calculamos la matriz de correlaciones $R$ entre percepciones dos a dos, buscando correlaciones muy elevadas que supondrían problemas
+2. Calculamos el índice de condicionamiento de la matriz $R$, y comprobamos que esté por debajo de 30
+3. Para cada una de las 7 percepciones, calculamos el factor de inflado de la varianza $VIF$. Todos deben estar por debajo de 10, y preferentemente, por debajo de 5
+
+Comenzamos con la matriz de correlaciones:
+
+```{r}
+R <- cor(hatcoclean[, 6:12])
+R
+```
+
+Visualizamos dicha matriz, para que el estudio sea más sencillo a simple vista. Para ello, es necesario tener instalado el paquete `corrplot:`
+
+```{r}
+library(corrplot)
+corrplot(R)
+```
+
+Con esto, es fácil ver que:
+
+- velocidad y servconj están bastante correlados (en concreto, $0.6065647$)
+- velocidad y flexprec están algo correlados (en concreto, $0.51439674$)
+- velocidad y calidadp están algo correlados (en concreto, $-0.4951789$)
+- precio y flexprec están algo correlados (en concreto, $-0.48923614$)
+- precio y serconj están algo correlados (en concreto, $0.5127076$)
+- precio y calidadp están algo correladas (en concreto, $0.4684921$)
+- ...
+
+Como tenemos muchas correlaciones suaves, nos centramos ahora en las que están por encima de $0.6$ en valor absoluto:
+
+- imgfabri e imgfvent están muy correladas (en concreto, $0.78999087$)
+- velocidad y servconj están bastante correlados (en concreto, $0.6065647$)
+
+Estas dos correlaciones tan altas pueden ser un problema. Para investigar más sobre la posible problemática, calculamos ahora el índice de condicionamiento de la matriz $R$:
+
+```{r}
+ai <- eigen(R)$values
+cond_val <- sqrt(max(ai) / min(ai))
+cond_val
+```
+
+Dicho índice está por debajo de 30, así que parece que las anteriores correlaciones no son demasiado peligrosas. Ahora calculamos el factor de inflado de la varianza:
+
+```{r}
+# TODO -- necesitamos disponer de la libreria car instalada en el sistema
+# vif(mod2)
+```

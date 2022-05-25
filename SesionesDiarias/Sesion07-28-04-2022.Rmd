@@ -295,6 +295,8 @@ Las variables cualitativas, en formato factor, de nuestro dataset, son:
 - `jobcat`
 - `minority`
 
+## Estudio de `jobcat`
+
 Podemos construir tablas de frecuencias (absolutas con `table` o relativas con `prop.table`) unidimensionales. Mostramos estas tablas para `jobcat`.
 
 Frecuencias absolutas:
@@ -328,3 +330,255 @@ Y ahora con el gráfico de sectores:
 ```{r}
 pie(tab)
 ```
+
+## Estudio de `gender`
+
+Repetimos el análisis para la variable `gender`, empezando por la tabla cásica de frecuencias:
+
+```{r}
+tab <- table(gender)
+tab.fi <- prop.table(tab)
+data.frame(tab, Freq.rel = as.numeric(tab.fi))
+```
+
+Vemos que tenemos menos mujeres (41 menos) que hombres. Pasamos a mostrar los gráficos de barras y de sectores:
+
+
+```{r}
+barplot(tab)
+pie(tab)
+```
+
+Con estos dos gráficos vemos lo que ya habíamos comentado previamente.
+
+## Estudio de `minority`
+
+Repetimos el análisis para la variable `minority`, empezando por la tabla cásica de frecuencias:
+
+```{r}
+tab <- table(minority)
+tab.fi <- prop.table(tab)
+data.frame(tab, Freq.rel = as.numeric(tab.fi))
+```
+
+Del mismo modo, tenemos 265 personas menos de una minoria que de una no minoría. Esto se va a hacer explícito en los siguientes dos gráficos:
+
+```{r}
+barplot(tab)
+pie(tab)
+```
+
+## Análisis conjunto de `jobcat` y `gender`
+
+Mostramos la tabla de contingencia (frecuencias) de las dos variables `jobcat` y `gender`, conjuntamente.
+
+```{r}
+tab2 <- table(jobcat, gender)
+tab2
+```
+
+Podemos añadir las sumas por filas y columnas:
+
+```{r}
+addmargins(tab2)
+```
+
+Podemos visualizar estas tablas de contingencia, con **gráficos de barras agrupadas o apiladas**:
+
+```{r}
+barplot(tab2)
+```
+
+Notar que:
+
+- Tenemos dos valores, uno por cada valor del factor del género
+- Tenemos tres barras apiladas, una por cada valor de `jobcat`
+
+Por tanto, parece necesario indicar esta información en el gráfico anterior:
+
+```{r}
+barplot(
+    tab2,
+    legend.text = TRUE,
+    args.legend = list(x = 'topleft', bty = 'n'),
+    ylim = c(0, 300),
+    density = 30, col=c('green', 'blue', 'red'),
+    main = 'Number of employees by gender and job category'
+)
+
+barplot(
+    tab2,
+    legend.text = TRUE,
+    args.legend = list(x='top',  bty='n'),
+    density = 30,
+    col = c('green', 'blue','red'),
+    main = 'Number of employees by gender and job category',
+    beside = TRUE
+)
+```
+
+## Análisis conjunto de `jobcat` y `minority`
+
+Empezamos mostrando la tabla de contingencia, en la que ya añadimos la suma de las variables por separado:
+
+
+```{r}
+tab2 <- table(jobcat, minority)
+addmargins(tab2)
+```
+
+Mostramos ahora el gráfico de barras apiladas:
+
+
+```{r}
+barplot(
+    tab2,
+    legend.text = TRUE,
+    args.legend = list(x = 'topleft', bty = 'n'),
+    ylim = c(0, 300),
+    density = 30, col=c('green', 'blue', 'red'),
+    main = 'Number of employees by minority and job category'
+)
+
+barplot(
+    tab2,
+    legend.text = TRUE,
+    args.legend = list(x='top',  bty='n'),
+    density = 30,
+    col = c('green', 'blue','red'),
+    main = 'Number of employees by minority and job category',
+    beside = TRUE
+)
+```
+
+De la tabla de contingencias y de las dos gráficas sacamos las siguientes **conclusiones**:
+
+- El procentaje de puestos de trabajo de más alta categoría (*custodial*, *manager*) es mucho menor en minorías que en no minorías
+- El porcentaje de *managers* es mucho más elevado en no minorias
+- Por tanto, es muchísimo más difícil escalar de puesto de trabajo si pertecenes a una minoría que si no perteneces
+
+# Ejercicio Propuesto
+
+Vamos a trabajar con el *dataset* `airquality`, que procedo a cargar:
+
+```{r}
+dataset <- airquality
+head(dataset, 5)
+```
+
+Voy a darle nombre a los meses, porque en un gráfico posterior me será útil
+
+```{r}
+dataset <- within(dataset, {
+    # Uso month.name para obtener los meses del año
+    # Solo hay meses del 5 al 9, asi que solo me quedo con esos nombres
+    Month <- factor(Month, labels = month.name[5:9])
+})
+```
+
+## Primer ejercicio
+
+**Enunciado**: Construir un histograma del contaminante Ozone considerando intervalos de amplitud 10.
+
+```{r}
+# Maximo y minimo para calcular el numero de breaks que tenemos que hacer
+min.ozone <- min(dataset$Ozone, na.rm = TRUE)
+max.ozone <- max(dataset$Ozone, na.rm = TRUE)
+
+# Histograma
+hist(
+    dataset$Ozone[is.na(dataset$Ozone) == FALSE],
+    breaks = (max.ozone - min.ozone) / 10.0,
+    main = "Histograma del ozono",
+    xlab = "Valor del ozono"
+)
+```
+
+## Segundo ejercicio
+
+**Enunciado**: Superponer al histograma anterior la función de densidad de una distribución normal cuyos parámetros media y desviación típica sean las de los datos Ozone. ¿Te parece que estos datos se podrían modelizar mediante ese modelo de probabilidad?
+
+```{r}
+# Volvemos a poner el histograma del ejercicio anterior
+ozone.min <- min(dataset$Ozone, na.rm = TRUE)
+ozone.max <- max(dataset$Ozone, na.rm = TRUE)
+hist(
+    dataset$Ozone[is.na(dataset$Ozone) == FALSE],
+    breaks = (ozone.max - ozone.min) / 10.0,
+    main = "Histograma del ozono",
+    xlab = "Valor del ozono"
+)
+
+# Añadimos la distribucion normal
+ozone.mean <- mean(dataset$Ozone, na.rm = TRUE)
+ozone.sd <- sd(dataset$Ozone, na.rm = TRUE)
+curve(pnorm(x, mean = ozone.mean, sd = ozone.sd), col = "blue", add = TRUE)
+```
+
+A simple vista es muy fácil comprobar que una distribución normal no parece ser una buena distribución para modelar los datos.
+
+## Tercer ejercicio
+
+**Enunciado**: Construir un gráfico de normalidad para la variable Ozone. ¿Qué te indica el gráfico? Confirmar el resultado con un contraste de hipótesis.
+
+Empezamos mostrando el gráfico de normalidad:
+
+```{r}
+qqnorm(salary)
+```
+
+Vemos que la distribución de los datos no sigue una normal, pues el gráfico de normalidad no se asemeja a una línea recta. El gráfico nos muestra que la cola derecha es mucho más ligera y parecida a una normal que la cola izquierda. Confirmamos esto con un contraste de hipótesis:
+
+```{r}
+ks.test(salary,pnorm,mean=mean(salary),sd=sd(salary))
+```
+
+Podemos **concluir** que, como el $p-value$ es muy pequeño, rechazamos $H_0$, luego los datos no siguen una distribución de probabilidad normal.
+
+## Cuarto ejercicio
+
+**Enunciado**: Construir un diagrama de cajas del contaminante Ozone. ¿Qué puedes interpretar del gráfico?
+
+```{r}
+boxplot(dataset$Ozone)
+```
+
+- Podemos ver que tenemos dos *outliers*, con valores de concentración de ozono demasiado altos.
+- También podemos ver que la distribución de los datos está más concentrada en valores bajos, que en valores altos
+- La cola de la izquierda es más pesada que la cola de la derecha
+
+## Quinto ejercicio
+
+**Enunciado**: Construir un diagrama de cajas múltiple del contaminante Ozone que permita comparar sus valores en los meses de mayo, junio, julio, agosto y septiembre. ¿Qué puedes interpretar del gráfico?
+
+```{r}
+boxplot(dataset$Ozone ~ dataset$Month, xlab = "Mes", ylab = "Concentración de Ozono")
+```
+
+Lo que parece claro con este gráfico es que en los messe de verano, aumenta la concentración de Ozono. Podemos suponer que esto se debe a una temperatura más alta, menos precipitaciones, ...
+
+## Sexto ejercicio
+
+**Enunciado**: Construir dos diagramas de dispersión que nos permita visualizar la posible relación entre: (i) la velocidad del viento, Wind, y el contaminante Ozone; y (ii) la temperatura, Temp, y Ozone. ¿Qué puedes interpretar de los gráficos?
+
+Empiezo mostrando el diagrama de dispersión de las variables `Wind, Ozone`:
+
+```{r}
+plot(dataset$Wind, dataset$Ozone, xlab = "Velocidad del viento", ylab = "Concentración de Ozono")
+```
+
+A partir de este gráfico:
+
+- Parece que a mayor velocidad del viento, menor concentración de Ozono en el aire. Esto se corresponde con nuestro sentido común
+
+Ahora muestro el diagrama de dispersión de las variables `Temp, Ozone`:
+
+```{r}
+plot(dataset$Temp, dataset$Ozone, xlab = "Temperatura", ylab = "Concentración de Ozono")
+```
+
+A partir de este gráfico:
+
+- Parece confirmarse lo que ya habíamos comentado al observar los meses. A mayor temperatura, mayor concentración de Ozono en el aire
+
+En ambos casos, esto que hemos comentado podemos intentar cuantificarlo realizando una regresión lineal, y viendo la relación que conseguimos así y la calidad de dicho ajuste.
