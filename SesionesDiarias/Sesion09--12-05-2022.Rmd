@@ -536,3 +536,20 @@ anovares
 ```
 
 Pasa lo mismo con la variable `calidadp`, y los motivo pueden ser los mismos.
+
+## Eliminación de la variable `calidadp`
+
+Estoy viendo que `calidadp` puede no ser una buena variable, aunque haya sido escogida en el algoritmo *stepwise*. Así que elimino esta variable manualmente y miro la calidad del ajuste realizado. Empiezo realizando la regresión sin esta variable:
+
+```{r}
+mod4 <- lm(formula = fidelidad ~ flexprec + servconj + imgfvent,  data = hatcoclean)
+```
+
+Ahora, veamos la calidad del ajuste realizado:
+
+```{r}
+summary(mod4)
+```
+
+El valor de $R^2$ ha bajado respecto al modelo obtenido con el algoritmo *stepwise*. Por tanto, podemos pensar que la variable `calidadp` es útil a la hora de realizar el ajuste lineal de los datos.
+
