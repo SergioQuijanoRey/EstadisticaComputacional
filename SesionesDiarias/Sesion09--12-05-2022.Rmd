@@ -155,10 +155,13 @@ A partir de estas gráficas, podemos extraer las siguientes **conclusiones**:
 Ahora, usamos el *test* de *Durbin-Watson* para comprobar lo que hemos comentado previamente:
 
 ```{r}
-# TODO -- no consigo instalar esta libreria
-# library(lmtest)
-# dwtest(modelo)
+library(lmtest)
+dwtest(mod1)
 ```
+
+En este test, la hipótesis nula $H_0$ es que las autocorrelaciones es cero. Por tanto, lo que buscamos es que el $p-value$ del test sea grande, por encima de $0.05, 0.1$ aproximadamente.
+
+En nuestro caso, como tenemos un $p-value$ de $0.3179 >> 0.1$, no podemos rechazar $H_0$, y por tanto, podemos pensar que las autocorrelaciones son cero, que es lo que íbamos buscando.
 
 ## Estudiamos la normalidad de los errores
 
@@ -217,9 +220,26 @@ Hemos supuesto previamente la linealidad en la relación entre la respuesta y la
 ```{r}
 # Esta libreria no viene instalada por defecto, asi que hay que instalarla
 # antes de usarla antes de usarla
-# TODO -- descomentar cuando tenga instalada la libreria
-# library(car)
+library(car)
+
+# Cargada la libreria, mostramos la grafica componente mas residuos
+crPlots(mod1)
 ```
+
+En las siguientes variables, la **linealidad es clara**:
+
+- Precio
+- flexprec
+- servconj
+
+Pero en las siguientes variables, la **linealidad no es clara**, pero tampoco se desvía mucho de la relación lineal que vemos con las líneas discontinuas:
+
+- Velocidad
+- imgfabri
+- imgfvent
+- calidadp
+
+Sí que es verdad que los errores en `velocidad` se desvían mucho más de una relación lineal, y parecen seguir una relación cuadrática. Sin embargo, la desviación no es lo suficientemente grande como para que nos preocupe.
 
 ## Identificación de datos anómalos
 
@@ -271,10 +291,11 @@ Efectivamente, son las empresas que ya habíamos detectado como anómalas al est
 Todo este trabajo se simplifica bastante con la librería `car`. Mostramos cómo se usa a continuación:
 
 ```{r}
-# TODO -- descomentar cuando consiga instalar la libreria
-# library(car)
-# influenceIndexPlot(mod1)
+library(car)
+influenceIndexPlot(mod1)
 ```
+
+Con esta librería, podemos visualizar los gráficos que hemos usado previamente para localizar datos anómalos en una sola imagen. Además, tenemos algunas gráficas adicionales que nos pueden ser útiles.
 
 
 ## Identificación de datos aislados
@@ -461,6 +482,7 @@ cond_val
 Dicho índice está por debajo de 30, así que parece que las anteriores correlaciones no son demasiado peligrosas. Ahora calculamos el factor de inflado de la varianza:
 
 ```{r}
-# TODO -- necesitamos disponer de la libreria car instalada en el sistema
-# vif(mod2)
+vif(mod2)
 ```
+
+Buscamos que todos estén por debajo de 10, y preferiblemente, por debajo de 5. Sin embargo, `velocidad, precio, servconj` están por encima de 30 (de hecho, `serconj` por encima de 40), y por tanto, parece que tenemos un **problema de multicolinealidad con estas tres variables**.
