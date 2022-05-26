@@ -486,3 +486,53 @@ vif(mod2)
 ```
 
 Buscamos que todos estén por debajo de 10, y preferiblemente, por debajo de 5. Sin embargo, `velocidad, precio, servconj` están por encima de 30 (de hecho, `serconj` por encima de 40), y por tanto, parece que tenemos un **problema de multicolinealidad con estas tres variables**.
+
+# Selección de variables explicativas
+
+En apartados anteriores, ya hemos visto que ciertas variables no son del todo útiles, y que ciertas variables pueden tener un problema de multicolinealidad. En esta sección vamos a usar un método de selección automática de variables explicativas paso a paso (*stepwise*).
+
+Vamos a aplicar un algoritmo de este tipo basado en el **criterio de Akaike** (*AIC*). El algoritmo añade y elimina variables basándose en el *AIC*. Devuelve el modelo que menor valor de *AIC* ha logrado. Lo aplicamos al segundo modelo construido:
+
+```{r}
+step(mod2)
+```
+
+El modelo ha empezado con las 7 variables, y ha acabado con las variables:
+
+- `flexprec`
+- `servconj`
+- `imgfvent`
+- `calidadp`
+
+Por tanto, `direction = 'backward'`. Probamos ahora en dos direcciones:
+
+```{r}
+step(mod2, direction = "both")
+```
+
+Acabamos con el mismo modelo que con `'backward'`. El valor de *AIC* logrado es el mismo que en caso anterior. Por lo tanto, nos podemos quedar con dicho modelo y ver qué resultados nos ofrece:
+
+```{r}
+mod3 <- step(mod2, direction = "both")
+```
+
+## Estudio de la calidad del nuevo modelo obtenido
+
+Miramos la bondad del ajuste
+
+```{r }
+print(summary(mod3))
+```
+
+Hemos logrado un $R^2$ ajustado de 0.8013, que supone cierto margen de mejora respecto al $R^2$ del segundo modelo de $0.7975$
+
+Vemos que todas las variables, salvo `calidadp`, son relevantes. Quizás esto se deba a que, al habernos quedado con las mejores variables, `calidadp` no destaca demasiado a pesar de ser una buena variable. De hecho, ya hemos comentado esto previamente, las tres mejores variables destacan demasiado sobre las siguientes variables.
+
+Realizamos ahora el test ANOVA
+
+```{r }
+anovares <- anova(mod3)
+anovares
+```
+
+Pasa lo mismo con la variable `calidadp`, y los motivo pueden ser los mismos.
