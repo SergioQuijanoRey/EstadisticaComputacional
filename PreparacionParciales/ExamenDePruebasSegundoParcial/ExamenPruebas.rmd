@@ -193,6 +193,60 @@ perc_err
 
 **Enunciado**: La distribución Pareto de parámetros a, b > 0 corresponde a una función inversa de probabilidad: $$x = F^{-1}(u) = \frac{b}{(1 - u)^{\frac{1}{a}}}$$ Utilizando el método de inversión se pide generar n = 1000 valores de un distribución Pareto de parámetros a = 5 y b = 4. Evaluar usando gráficos y el contraste de Kolmogorov-Smirknow que en efecto los valores generados provienen de dicha distribución.
 
+Vamos a usar una función que resuelve la tarea en general:
+
+```{r}
+# Funcion que devuelve el
+# `n` numero de valores que queremos generar de la distribucion
+# `F_inv` función de densidad inversa
+metodo_inversion <- function(n, F_inv) {
+
+    # Generamos n valores de una uniforme 0, 1
+    U <- runif(n = n, min = 0, max = 1)
+
+    # Usamos la función inversa para generar el muestreo simulado
+    X <- F_inv(U)
+
+    # Devolvemos dichos valores
+    return(X)
+}
+```
+
+Con esto, pasamos a generar los 1000 valores de dicha distribución:
+
+```{r}
+# Parametros de la simulacion
+a <- 5
+b <- 4
+n <- 1000
+F_inv <- function(u) b / (1 - u)^(1 / a)
+
+# Tomamos los puntos
+x <- metodo_inversion(n, F_inv)
+```
+
+Mostramos los puntos obtenidos en un histograma:
+
+```{r}
+hist(x)
+```
+
+Veamos ahora que los datos se asimilan a tomar la distribución como tal. Empezamos comparando la función de densidad que nos da el histograma con la función de densidad real:
+
+```{r}
+# Empezamos con el histograma
+hist(x, prob = TRUE)
+
+# Añadimos las lineas suavizadas que vienen del histograma
+lines(density(x), col = "blue")
+
+# Ahora añadimos la linea de densidad real de la distribucion
+f <- function(x) (a*b^a) / (x^(a+1))
+curve(f(x), add = TRUE, col = "red")
+```
+
+Gráficamente podemos ver que la aproximación conseguida es muy buena. Veamos esto con un contraste de Kolmogorov-Smirknow:
+
 # Ejercicio 4
 
 **Enunciado**: Utilizando integración de Monte Carlo se pide aproximar la integral $$\int_0^1 \frac{1}{1 + x^2} dx$$ y calcular el error de la aproximación. Considerar para ello un número sucientemente grande de simulaciones, evaluando la convergencia mediante un gráfico. Como referencia tener en cuenta que el valor exacto de la integral es $\frac{\pi}{4}$.
@@ -246,9 +300,9 @@ montecarlo_simple <- function(nsim = 1000, f, seed = 1, show_plot = FALSE) {
             xlab = "Número de simulaciones"
         )
         z <- qnorm(0.025, lower.tail = FALSE)
-        lines(approx_int_seq - z * error, col="blue", lwd = 2, lty = 3)
-        lines(approx_int_seq + z * error, col="blue", lwd = 2, lty = 3)
-        abline(h = approx_int_seq[nsim], col=2)
+        lines(approx_int_seq - z * error, col = "blue", lwd = 2, lty = 3)
+        lines(approx_int_seq + z * error, col ="blue", lwd = 2, lty = 3)
+        abline(h = approx_int_seq[nsim], col = 2)
     }
 
     # Devolvemos los datos, esto es, la aproximacion final, el error de la
@@ -267,3 +321,16 @@ res <- montecarlo_simple(nsim = nsim, f = f, seed = 1, show_plot = TRUE)
 res$approx_int
 res$error
 ```
+
+Ahora podemos comparar con el valor real de la integral, que es $\frac{\pi}{4}$:
+
+```{r}
+real_int <- pi / 4
+abs_err <- abs(res$approx_int - real_int)
+abs_err
+
+rel_err <- abs_err / real_int * 100
+rel_err
+```
+
+El error relativo es aproximadamente $0.08\%$, que es un valor completamente satisfactorio para nuestros objetivos.
