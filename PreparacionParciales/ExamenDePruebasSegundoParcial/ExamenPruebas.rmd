@@ -1,0 +1,192 @@
+---
+title: Examen de pruebas
+author:
+    - Sergio Quijano Rey
+    - sergioquijano@correo.ugr.es
+date:
+output:
+    html_document:
+        toc: true
+        toc_depth: 3
+        toc_float: false
+        collapsed: true
+        number_sections: true
+---
+
+# Ejercicio 1
+
+**Enunciado**: Establecer la semilla del generador de números aleatorios escribiendo set.seed(1). A continuación generar 50 valores desde una distribución Chi-cuadrado con n = 30 grados de libertad y almacenarlos en un vector y. Después generar 50 valores desde una distribución Normal con media µ = 30 y desviación típica σ = 5 y almacenarlos en un vector x. A partir de estos vectores se pide resolver la siguientes tareas:
+
+Establecemos la semilla:
+
+```{r}
+set.seed(1)
+```
+
+Ahora, generamos los 50 valores desde una distribución Chi-cuadrado con 30 grados de libertad:
+
+```{r}
+# Parametros del muestreo
+df <- 30
+n <- 50
+
+# Muestreo
+y <- rchisq(n = n, df = df)
+y
+```
+
+Ahora generamos 50 valores desde una distribución normal de media 30 y desviación típica 5
+
+```{r}
+# Parametros del muestreo
+n <- 50
+mu <- 30
+sigma <- 5
+
+# Muestreo
+x <- rnorm(n, mean = mu, sd = sigma)
+x
+```
+
+1. Calcular la media, la desviación típica y los tres cuartiles de y.
+
+```{r}
+y.mean <- mean(y)
+y.mean
+
+y.sd <- sd(y)
+y.sd
+
+y.q1 <- quantile(y, 0.25)
+y.q2 <- quantile(y, 0.5)
+y.q3 <- quantile(y, 0.75)
+
+y.q1
+y.q2
+y.q3
+```
+
+2. Representar un histograma de los datos almacenados en y.
+
+```{r}
+hist(y)
+```
+
+3. Superponer al histograma anterior la curva de la densidad Normal con media y desviación típica la de los datos.
+
+```{r}
+# Vuelvo a poner el histograma del ej. anterior
+# Hago freq = FALSE para usar frecuencia relativa y no absoluta
+# Tambien me serviria `hist(y, prob = TRUE)`
+hist(y, freq = FALSE)
+
+# Superpongo la curva de la densidad normal
+curve(dnorm(x, mean = y.mean, sd = y.sd), col = "darkblue", add = TRUE)
+```
+
+4. Representar un gráfico de probabilidad de los valores de y.
+
+```{r}
+# TODO -- no estoy nada seguro de esta
+hist(y, prob = TRUE)
+```
+
+5. Representar un gráfico de cajas de los valores de y.
+
+```{r}
+boxplot(y)
+```
+
+6. Representar un gráfico de cajas múltiples (2 cajas) que permita comparar la distribución de x e y.
+
+```{r}
+boxplot(x, y)
+```
+
+7. Representar un diagrama de dispersión de los valores de x (en el eje horizontal) frente a los de y (en el eje vertical).
+
+```{r}
+plot(x, y, ylab = "Valores de y", xlab = "Valores de x")
+```
+
+8. Ajustar un modelo de regresión lineal $$y_i = \beta_0 + \beta_1 x_i + \epsilon_i ; i \in \Delta_{50}$$ con los datos almacenados en x e y. Representar el modelo ajustado (la recta de regresión) sobre el diagrama de dispersión anterior.
+
+Empiezo realizando el ajuste:
+
+```{r}
+# Pongo todo en un dataframe para que sea mas sencillo realizar el ajuste
+df <- data.frame(x = x, y = y)
+
+# Aplico el ajuste usando el data frame anterior
+mod <- lm(formula = y ~ x, data = df)
+mod
+```
+
+Ahora superpongo el gráfico anterior sobre el *scatter plot*:
+
+```{r}
+# Empiezo haciendo el scatter plot
+plot(x, y)
+
+# Ahora añado la linea que me da el ajuste realizado
+abline(mod)
+```
+
+# Ejercicio 2
+
+**Enunciado**: En 1651, el Caballero de Méré le planteó a Pascal una pregunta relacionada con las apuestas en juegos de azar: ¿sería adecuado apostar a que en cuatro lanzamientos de un dado se obtendrá al menos un seis? Este problema generó una fructífera correspondencia entre Pascal y Fermat que se contribuyó al nacimiento del Cálculo de Probabilidades. Se pide:
+
+1. Escribir una función que simule el lanzamiento de n dados. La función tendrá un único argumento, el número de lanzamientos n, y tomará el valor 4 por defecto. La función devolverá como posibles valores TRUE, si se obtiene al menos un 6 y FALSE en caso contrario
+
+```{r}
+# Simula el lanzamiento de `n` dados. Devuelve TRUE si en los `n` lanzamientos
+# sale al menos un 6, y devuelve FALSE en otro caso
+lanzamiento_dados <- function(n = 4) {
+    # Simulamos los lanzamientos de n monedas de seis caras
+    monedas <- 1:6
+    lanzamientos <- sample(x = monedas, size = n, replace = TRUE)
+
+    # Contamos el numero de lanzamientos en los que sale un 6
+    lanzamientos_buenos <- length(which(lanzamientos == 6))
+
+    # Devolvemos si al menos ha habido un lanzamiento bueno
+    return(lanzamientos_buenos > 0)
+}
+
+lanzamiento_dados()
+```
+
+2. Utilizar la función anterior para simular `nsim=10000` jugadas de este juego y calcular la proporción de veces que se gana la apuesta de obtener al menos un 6 en `n = 4` lanzamientos. Comparar el resultado con la probabilidad exacta que es $1 − (\frac{5}{6})^n$.
+
+```{r}
+# Establecemos los parametros de la simulacion
+simulaciones <- 1000
+n <- 4
+
+# Realizamos las simulaciones
+resultados <- vector()
+for(i in 1:simulaciones){
+    resultados[i] <- lanzamiento_dados(n)
+}
+
+# Calculamos las simulaciones con exito y sin exito
+exito <- sum(resultados)
+fracaso <- sum(!resultados)
+
+# Calculamos ahora la probabilidad
+prob <- exito / (exito + fracaso)
+prob
+
+# Comparamos ese valor con el real
+prob_real <- 1 - (5/6)^n
+prob_real
+
+# Realizamos una comparacion mas numerica
+abs_err <- abs(prob - prob_real)
+abs_err
+
+perc_err <- abs_err / prob_real * 100
+perc_err
+```
+
+# Ejercicio 3
