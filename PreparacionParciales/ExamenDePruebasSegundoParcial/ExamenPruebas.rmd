@@ -190,3 +190,80 @@ perc_err
 ```
 
 # Ejercicio 3
+
+**Enunciado**: La distribución Pareto de parámetros a, b > 0 corresponde a una función inversa de probabilidad: $$x = F^{-1}(u) = \frac{b}{(1 - u)^{\frac{1}{a}}}$$ Utilizando el método de inversión se pide generar n = 1000 valores de un distribución Pareto de parámetros a = 5 y b = 4. Evaluar usando gráficos y el contraste de Kolmogorov-Smirknow que en efecto los valores generados provienen de dicha distribución.
+
+# Ejercicio 4
+
+**Enunciado**: Utilizando integración de Monte Carlo se pide aproximar la integral $$\int_0^1 \frac{1}{1 + x^2} dx$$ y calcular el error de la aproximación. Considerar para ello un número sucientemente grande de simulaciones, evaluando la convergencia mediante un gráfico. Como referencia tener en cuenta que el valor exacto de la integral es $\frac{\pi}{4}$.
+
+Definimos la función a integrar:
+
+```{r}
+f <- function(x) 1 / (1 + x * x)
+```
+
+Con esto, realizamos la **integración Montecarlo clásica**. Empezamos expresando esto en una función, que puede ser re-usada:
+
+```{r}
+# Funcion para realizar la aproximacion de una integral en el intervalo 0, 1
+#
+# PARAMETERS
+# ==========
+# `nsim` numero de simulaciones que queremos lanzar
+# `f` funcion que estamos integrando en (0, 1)
+# `seed` semilla aleatoria que queremos usar
+# `show_plot` TRUE si queremos que se muestre el grafico de aproximacion
+#
+# RETURNS
+# =======
+# `approx_int` valor de la aproximacion
+# `error` estimacion del error cometido
+# `approx_seq` secuencia de valores de aproximaciones a la integral
+montecarlo_simple <- function(nsim = 1000, f, seed = 1, show_plot = FALSE) {
+    # Fijamos la semilla aleatoria
+    set.seed(1)
+
+    # Muestreamos de una uniforme 0, 1 y aplicamos la funcion sobre esa muestra
+    x <- runif(n = nsim, min = 0, max = 1)
+    fx <- f(x)
+
+    # Realizamos la aproximacion usando los valores previamente calculados
+    # En vez de guardar el valor final de la aproximacion, guardamos la secuencia de aproximaciones
+    # para poder mostrar graficos de convergencai
+    approx_int_seq <- cumsum(fx) / (1:nsim)
+
+    # Calculamos los errores en la aproximacion
+    error <- sqrt(cumsum((fx - approx_int_seq)^2)) / (1:nsim)
+
+    # Mostramos graficamente los errores si asi se ha dado por parametro
+    if(show_plot == TRUE) {
+        plot(
+            1:nsim,
+            approx_int_seq,
+            type = "l",
+            ylab = "Aproximación y límites de error",
+            xlab = "Número de simulaciones"
+        )
+        z <- qnorm(0.025, lower.tail = FALSE)
+        lines(approx_int_seq - z * error, col="blue", lwd = 2, lty = 3)
+        lines(approx_int_seq + z * error, col="blue", lwd = 2, lty = 3)
+        abline(h = approx_int_seq[nsim], col=2)
+    }
+
+    # Devolvemos los datos, esto es, la aproximacion final, el error de la
+    # aproximacion y toda la secuencia
+    return(list(approx_int = approx_int_seq[nsim], error = error[nsim], approx_seq = approx_int_seq))
+}
+```
+
+Nos aprovechamos de esta función para aproximar la integral, viendo el gráfico de aproximación y el error cometido:
+
+```{r}
+# Fijamos los parametros de la simulacion
+nsim <- 1000
+
+res <- montecarlo_simple(nsim = nsim, f = f, seed = 1, show_plot = TRUE)
+res$approx_int
+res$error
+```
