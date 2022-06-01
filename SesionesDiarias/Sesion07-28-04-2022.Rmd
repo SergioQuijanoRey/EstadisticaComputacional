@@ -88,9 +88,17 @@ lines(density(salary),col='blue')
 Sobre el gráfico anterior dibujo la función de densidad de una normal, cuya media y desviación típica sean la de los datos de `salary`.
 
 ```{r}
-distribucion <- dnorm(salary, mean = mean(salary), sd = sd(salary))
+# Histograma basico de los datos
 hist(salary, breaks = c(x1, x2, x3))
-curve(dnorm(x, mean = mean(salary), sd = sd(salary)), col = 'blue', add = TRUE)
+
+# Funcion de densidad de los datos en azul
+lines(density(salary),col='blue')
+
+# Distribucion normal con media y desviacion la de los datos, en rojo sobre el grafico anterior
+curve(dnorm(x,mean=mean(salary),sd=sd(salary)),add=TRUE,col='red',lty=2)
+
+# Leyenda explicativa
+legend('topright',c('Función de densidad suavizada','Función de densidad Normal'))
 ```
 
 No parece que sea un buen modelo de probabilidad para los datos, no se ajusta a la distribución que visualizamos con el histograma.
