@@ -3,6 +3,7 @@ title: Preparación del Segundo Parcial
 author: Sergio Quijano Rey
 date: 01.06.2022
 geometry: margin = 3.0cm
+url: https://github.com/SergioQuijanoRey/EstadisticaComputacional
 ---
 
 # Generalidades
@@ -642,7 +643,6 @@ g(n) <- function(n) rbeta(nsim, 2.5, 5)
 # Se muestra el grafico de convergencia cuando `should_plot == TRUE`
 montecarlo_infinito <- function(g, c, should_plot = FALSE) {
 
-
     # Realizamos el muestreo de valores y mapeo por la funcion
     x_values <- g(nsim)
     fx <- sapply(x_values, c)
@@ -665,4 +665,34 @@ montecarlo_infinito <- function(g, c, should_plot = FALSE) {
     # Devolvemos los datos
     return(list(aproximacion = estim[nsim], error = estim.err[nsim], secuencia = estim))
 }
+```
+
+--------------------------------------------------------------------------------
+
+# Simulación de probabilidades
+
+## Simulación de una probabilidad compuesta
+
+- Cuando estamos componiendo probabilidades (ie. sumatoria con sumandos probabilidades y longitud una probabilidad) es bastante directo hacer esto
+- Por ejemplo, para la distribución de *Poisson* compuesta:
+
+```r
+# Numero de simulaciones
+nsim<-5000
+
+# simulamos ahora nsim valores de S_N:
+S <- double(nsim) # para almacenar los valores simulados
+set.seed(1)
+
+for (i in 1:nsim) {
+    n <- rpois(1,lam)
+    if (n>0) S[i] <- sum(rlnorm(n,mu,sig))
+}
+
+# el vector S contiene los valores simulados de S_N
+# un histograma de S nos da una aproximación de la distribución
+hist(S,xlim=c(0,7000),breaks=20,prob=TRUE, ylim=c(0,1.2e-3))
+
+# podemos superponer la densidad suavizada que calcula density()
+lines(density(S), col = "red")
 ```
