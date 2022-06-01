@@ -634,7 +634,7 @@ c <- function(x) sin(x) * exp(-x)
 # Funcion para muestrear de la distribucion
 # A dicha funcion se le pasa el numero de simulaciones que queremos tomar
 # Nos apoyamos en la funcion `rbeta` de distribucion para generar la funcion
-g(n) <- function(n) rbeta(nsim, 2.5, 5)
+g <- function(n) rbeta(nsim, 2.5, 5)
 
 # Integración de montecarlo en limites infinitos
 # Se debe haber descompuesto la funcion a integrar convenientemente
@@ -695,4 +695,50 @@ hist(S,xlim=c(0,7000),breaks=20,prob=TRUE, ylim=c(0,1.2e-3))
 
 # podemos superponer la densidad suavizada que calcula density()
 lines(density(S), col = "red")
+```
+
+## Método inverso
+
+- Tenemos que conocer $F^{-1}(u)$ la función inversa a la función de distribución
+- Con ello, podemos usar la siguiente función:
+
+```r
+# Funcion que devuelve un numero de valores simulados de una distribucion de probabilidad
+# `n` numero de valores que queremos generar de la distribucion
+# `F_inv` inversa de la función de distribución
+metodo_inversion <- function(n, F_inv) {
+
+    # Generamos n valores de una uniforme 0, 1
+    U <- runif(n = n, min = 0, max = 1)
+
+    # Usamos la función inversa para generar el muestreo simulado
+    X <- F_inv(U)
+
+    # Devolvemos dichos valores
+    return(X)
+}
+```
+
+- Podemos mostrar el histograma de los datos obtenidos, junto con la linea de densidad de los datos y la función de densidad real:
+    - Para ello necesitamos conocer $f(x)$ la función de densidad real
+
+```r
+# Empezamos con el histograma
+hist(x, prob = TRUE)
+
+# Añadimos las lineas suavizadas que vienen del histograma
+lines(density(x), col = "blue")
+
+# Ahora añadimos la linea de densidad real de la distribucion
+f <- function(x) (a*b^a) / (x^(a+1)) # Esta es la función de densidad real
+curve(f(x), add = TRUE, col = "red")
+```
+
+- Se puede comprobar que la simulacion es buena con el *test de Kolgomorov-Smirnov*:
+    - De nuevo, recordar que hay que usar `p<distribucion>` o la función de densidad de probabilidad $f(x)$ que hayamos programado
+    - Buscamos, para aceptar que la simulación es buena, un valor alto del p-valor
+
+```r
+# TODO -- completar bien
+ks.test(x,pexp,rate=lambda)
 ```
