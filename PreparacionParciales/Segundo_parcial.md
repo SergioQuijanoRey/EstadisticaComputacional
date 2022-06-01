@@ -522,3 +522,147 @@ step(mod)
 ```r
 step(mod2, direction = 'both')
 ```
+
+--------------------------------------------------------------------------------
+
+# Aproximación de una probabilidad
+
+## Aproximar una probabilidad a partir de la uniforme
+
+- Por ejemplo, partimos de una uniforme $X,Y \sim \mathcal{U}^2[0, 1]$
+- Con este ejemplo, podemos calcular $P(X + Y \leq 0)$, con un **gráfico de convergencia**
+
+```r
+# Parametros de la simulacion
+nsim<-1000
+set.seed(1)
+
+# Aplicamos la simulacion, que es muy sencilla porque las variables salen de una
+# distribucion uniforme
+x <- runif(nsim, -1, 1)
+y <- runif(nsim, -1, 1)
+suceso <- (x + y <= 0)
+
+# Aproximación
+approx <- mean(suceso)
+
+# Error de estimacion
+estimacion_error <- sd(suceso) / sqrt(nsim)
+
+# Gráfico de convergencia
+# =======================
+
+# Aproximaciones para $n=1,...,nsim$
+estim<-cumsum(suceso)/(1:nsim)
+
+# Errores de estimación correspondientes
+estim.err<-sqrt(cumsum((suceso-estim)^2))/(1:nsim)
+
+# Con esto ya podemos realizar el grafico
+plot(
+    1:nsim,
+    estim,
+    type='l',
+    ylab='Aproximación y límites de error',
+    xlab='Número de simulaciones',main=expression(P(X+Y<=0)),
+    ylim=c(0,1)
+)
+z<-qnorm(0.025,lower.tail = FALSE)
+lines(estim - z*estim.err,col='blue',lwd=2,lty=3)
+lines(estim + z*estim.err,col='blue',lwd=2,lty=3)
+```
+
+# Aproximación de una integral
+
+## Montecarlo en un intervalo $(a, b)$
+
+- Lo coloco en una función para que sea fácil de aplicar
+- Mostramos también el gráfico de convergencia
+
+```r
+# Condiciones de la simulacion
+nsim <- 1000
+set.seed(1)
+
+# Integral de montecarlo para una funcion `f` en un intervalo (`lower`, `upper`)
+# Se usan `nsim` simulaciones para aproximar la integral
+# Se muestra el grafico de convergencia cuando `should_plot == TRUE`
+montecarlo_acotado <- function(f, nsim = 1000, lower = 0, upper = 1, should_plot = FALSE){
+
+    # Realizamos el muestreo de valores y mapeo por la funcion
+    x_values <- runif(nsim, lower, upper)
+    fx <- sapply(x_values, f)
+
+    # Aproximaciones para $n=1,...,nsim$
+    estim <- ((upper - lower) / (1:nsim)) * cumsum(fx)
+
+    # errores de estimación correspondientes
+    estim.err <- sqrt(cumsum((fx-estim)^2))/(1:nsim)
+    if(should_plot == TRUE) {
+        plot(1:nsim,estim,type='l',ylab='Aproximación y límites de error',xlab='Número de simulaciones')
+        z<-qnorm(0.025,lower.tail = FALSE)
+        lines(estim - z*estim.err,col='blue',lwd=2,lty=3)
+        lines(estim + z*estim.err,col='blue',lwd=2,lty=3)
+        abline(h = approx_int,col=2)
+    }
+
+    # Aproximación final y su error
+    estim[nsim]
+    estim.err[nsim]
+
+    # Devolvemos los datos
+    return(list(aproximacion = estim[nsim], error = estim.err[nsim], secuencia = estim))
+}
+```
+
+## Montecarlo en un intervalo infinito
+
+- Tenemos que descomponer $f(x) = c(x) \cdot g(x)$ donde $g(x)$ sea una función de densidad de una probabilidad
+- Con esto, muestreamos de esa distribución de probabilidad, multiplicamos por c(x) y aproximamos
+- Hacemos esto usando la siguiente función:
+
+```r
+# Condiciones de la simulacion
+nsim <- 1000
+set.seed(1)
+
+# Descomposicion de las funciones
+# La funcion f no la ponemos, porque es de la que vamos a muestrear
+c <- function(x) sin(x) * exp(-x)
+
+# Funcion para muestrear de la distribucion
+# A dicha funcion se le pasa el numero de simulaciones que queremos tomar
+# Nos apoyamos en la funcion `rbeta` de distribucion para generar la funcion
+g(n) <- function(n) rbeta(nsim, 2.5, 5)
+
+# Integración de montecarlo en limites infinitos
+# Se debe haber descompuesto la funcion a integrar convenientemente
+# `g` debe ser una funcion `g(numero_simulaciones)` que de la distribucion de probabilidad
+# `c` debe ser la funcion de ponderado
+# Se muestra el grafico de convergencia cuando `should_plot == TRUE`
+montecarlo_infinito <- function(g, c, should_plot = FALSE) {
+
+
+    # Realizamos el muestreo de valores y mapeo por la funcion
+    x_values <- g(nsim)
+    fx <- sapply(x_values, c)
+
+    # Aproximaciones para $n=1,...,nsim$
+    estim <-  cumsum(fx) / (1:nsim)
+
+    # errores de estimación correspondientes
+    estim.err <- sqrt(cumsum((fx-estim)^2))/(1:nsim)
+
+    # Mostramos la funcion cuando asi se indique
+    if(should_plot == TRUE) {
+        plot(1:nsim,estim,type='l',ylab='Aproximación y límites de error',xlab='Número de simulaciones')
+        z<-qnorm(0.025,lower.tail = FALSE)
+        lines(estim - z*estim.err,col='blue',lwd=2,lty=3)
+        lines(estim + z*estim.err,col='blue',lwd=2,lty=3)
+        abline(h = second_approx_int,col=2)
+    }
+
+    # Devolvemos los datos
+    return(list(aproximacion = estim[nsim], error = estim.err[nsim], secuencia = estim))
+}
+```
