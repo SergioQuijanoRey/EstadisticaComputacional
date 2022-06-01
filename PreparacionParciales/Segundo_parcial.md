@@ -357,4 +357,168 @@ anova(mod)
 - Realmente no es el p-value. El p-value es $1 - valor$, y queremos que sea un valor alto
 - Para el término constante, nos fijamos en `Intercept`
 
-<!-- TODO -- seguir con diagnostico del modelo, que viene en la pagina 6 -->
+## Diagnóstico del modelo
+
+- Consiste en comprobar que las hipótesis asumidas para construir el modelo se verifican
+- Análisis de los residuos:
+    - Normalidad
+    - Linealidad
+    - Homocedasticidad
+    - Incorrelación de los errores
+
+### Homocedasticidad
+
+- Tenemos que comprobar que los errores del modelo tengan varianza constante
+- Estudiamos esto sobre los errores estandarizados (estandarizar $e_i = Y_i - \hat{Y}_i$)
+- Los **errores estandarizados** se calculan con `rstandard`
+- Calculamos los residuos, representamos el gráfico de dispersión de los residuos. Para cada variable, el gráfico de dispersión
+- Buscamos que dichos gráficos sean aleatorios, sin patrones claros
+
+```r
+# Calculamos los errores estandares
+ei.std<-rstandard(mod1)
+
+# Para mostrar mas de un grafico en una imagen
+par(mfrow=c(2,4))
+
+# Mostramos los valores ajustados en funcion de los errores
+plot(mod1$fitted.values, ei.std, main = "" , xlab = "valores ajustados", ylab = "residuos estandarizados")
+abline(h=0,col=2)
+
+# Mostramos los graficos de dispersion para cada una de las percepciones
+for (j in 6:12) {
+    plot(hatco[, j], ei.std, main = "", xlab = paste0("x_", j), ylab = "residuos estandarizados")
+    abline(h = 0, col = 2)
+}
+```
+
+### Incorrelación
+
+- Para encontrar esto, mostramos el gráfico de los residuos frente al orden de cada una de las entradas de nuestro *dataset*
+
+```r
+plot(hatco$empresa, ei.std, main = "", xlab = "Número observación", ylab = "residuos estandarizados")
+abline(h = 0, col = 2)
+```
+
+- También podemos usar el test **Durbin-Watson**
+    - Buscamos que el p-value sea alto, para no rechazar la $H_0$ que es que los errores están incorrelados
+
+```r
+library(lmtest)
+dwtest(mod)
+```
+
+### Normalidad
+
+- Se asume que los errores del modelo siguen una distribución normal
+- Es de las hipótesis más importantes
+- Si tenemos $n > 100$, podemos usar *Kolgomorov-Smirnov*:
+
+```r
+ks.test(ei.std, pnorm)
+```
+
+- Podemos acompañarlo de un gráfico probabilístico normal:
+
+```r
+qqnorm(ei.std)
+```
+
+### Linealidad
+
+- Estudiamos la posible falta de linealidad entre la variable de salida y las variables explicativas
+- Se puede observar con la gráfica de dispersión múltiple que ya hemos realizado
+- Pero es más adecuado los **gráficos de componente más residuo**
+    - Tenemos que buscar falta de linealidad en estos patrones
+    - Nos ayudamos de la recta azul que se da en este gráfico
+    - La línea rosa tiene que aproximarse bastante a la línea rosa
+
+```r
+library(car)
+crPlots(mod)
+```
+
+### Identificación de datos anómalos e influyentes
+
+- Localizar filas con *+error estandarizado por encima de 2.5**:
+
+```r
+which(abs(ei.std) > 2.5)
+```
+
+- **Distancia de Cook**
+
+```r
+plot(hatco$empresa, cooks.distance(mod))
+```
+
+- **Aislamiento o _leverage_**
+
+```r
+plot(hatco$empresa, hatvalues(mod))
+```
+
+- Podemos hacer todas estas tareas con una librería:
+
+```r
+library(car)
+influenceIndexPlot(mod)
+```
+
+- Con esto podemos eliminar las entradas que sean anómalas o demasiado influyentes, por ejemplo:
+
+```r
+# Tomamos las entradas anomalas
+empresas_anomalas <- hatco[abs(residuos) > 2.5, ]$empresa
+
+# Filtramos el dataset
+hatcoclean <- hatco[hatco$empresa != empresas_anomalas, ]
+
+# Miramos que solo tengamos 98 filas en el dataset limpiado
+nrow(hatcoclean)
+```
+
+### Estudio de la multicolinealidad
+
+1. Matriz de correlaciones
+    - Los valores deben ser bajos
+
+```r
+R<-cor(hatco[,6:12])
+R
+```
+
+2. Indice de condicionamiento de la matriz de correlaciones
+    - Debe estar por debajo de 30
+
+```r
+# Autovalores de R
+ai<-eigen(R)$values
+
+# El índice IC
+IC <- sqrt(max(ai)/min(ai))
+```
+
+3. Para cada una de las percepciones, se calcula el **valor inflado de la varianza** VIF
+    - Todos deben estar por debajo de 10, preferentemente por debajo de 5
+
+```r
+library(car)
+vif(mod)
+```
+
+### Selección de variables explicativas
+
+- Usando un algoritmo *Stepwise*:
+    - Basado en el criterio de Akaike (**AIC**)
+
+```r
+step(mod)
+```
+
+- Podemos fijar la dirección:
+
+```r
+step(mod2, direction = 'both')
+```
