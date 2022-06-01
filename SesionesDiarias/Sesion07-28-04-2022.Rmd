@@ -514,13 +514,16 @@ hist(
     dataset$Ozone[is.na(dataset$Ozone) == FALSE],
     breaks = (ozone.max - ozone.min) / 10.0,
     main = "Histograma del ozono",
-    xlab = "Valor del ozono"
+    xlab = "Valor del ozono",
+
+    # Grafico de frecuencias relativas, porque vamos a superponer la normal!
+    prob = TRUE,
 )
 
 # Añadimos la distribucion normal
 ozone.mean <- mean(dataset$Ozone, na.rm = TRUE)
 ozone.sd <- sd(dataset$Ozone, na.rm = TRUE)
-curve(pnorm(x, mean = ozone.mean, sd = ozone.sd), col = "blue", add = TRUE)
+curve(dnorm(x, mean = ozone.mean, sd = ozone.sd), col = "blue", add = TRUE)
 ```
 
 A simple vista es muy fácil comprobar que una distribución normal no parece ser una buena distribución para modelar los datos.

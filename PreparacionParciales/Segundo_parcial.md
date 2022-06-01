@@ -68,6 +68,7 @@ lines(density(salary), col='blue')
 ```
 
 - **Histograma con función de densidad y distribución normal de media y desviación la de los datos**:
+    - Superponer la normal (pongo esto para poder buscar rápido en el examen)
 
 ```r
 # Histograma basico de los datos
@@ -81,6 +82,26 @@ curve(dnorm(x,mean=mean(salary),sd=sd(salary)),add=TRUE,col='red',lty=2)
 
 # Leyenda explicativa
 legend('topright',c('Función de densidad suavizada','Función de densidad Normal'),lty = 2)
+```
+
+- **Histograma de una variable, considerando intervalos de longitud `long`**
+    - Para ello, tengo que calcular el rango de dicha variable (max - min) y dividir en 10, para lograr los intervalos
+    - Hay que tener cuidado con los valores faltantes
+
+```r
+# Lo hago para el ejemplo concreto de `airquality$Ozone`, con `long = 10`
+
+# Maximo y minimo para calcular el numero de breaks que tenemos que hacer
+min.ozone <- min(dataset$Ozone, na.rm = TRUE)
+max.ozone <- max(dataset$Ozone, na.rm = TRUE)
+
+# Histograma
+hist(
+    dataset$Ozone[is.na(dataset$Ozone) == FALSE],
+    breaks = (max.ozone - min.ozone) / 10.0,
+    main = "Histograma del ozono",
+    xlab = "Valor del ozono"
+)
 ```
 
 - Obtener los metadatos de un histograma:
@@ -248,6 +269,8 @@ qqnorm(salary)
     - Buscamos, por tanto, no rechazar la hipótesis nula, luego el $p-value$ debe ser alto
     - Cuando el $p-value$ es bajo, se rechaza la hipótesis nula, es decir, la variable no sigue una distribución normal
 - **Test Kolgomorov-Smirnov**:
+    - Sirve para otras distribuciones además de la normal, por eso hay que especificar más parámetros que en el test de Shapiro
+    - Siempre hay que usar `p<distribucion>` o la función de densidad de probabilidad $f(x)$ que hayamos programado
 
 ```r
 # Usando el ejemplo del salario
@@ -255,6 +278,7 @@ ks.test(salary, pnorm, mean = mean(salary), sd = sd(salary))
 ```
 
 - **Test Saphiro-Wilks**:
+    - Solo sirve para tests de normalidad
 
 ```r
 # Usando el ejemplo del salario
