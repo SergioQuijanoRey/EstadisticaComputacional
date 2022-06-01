@@ -80,7 +80,7 @@ lines(density(salary),col='blue')
 curve(dnorm(x,mean=mean(salary),sd=sd(salary)),add=TRUE,col='red',lty=2)
 
 # Leyenda explicativa
-legend('topright',c('Función de densidad suavizada','Función de densidad Normal'),lty
+legend('topright',c('Función de densidad suavizada','Función de densidad Normal'),lty = 2)
 ```
 
 - Obtener los metadatos de un histograma:
@@ -90,14 +90,175 @@ metadatos <- hist(employees$salary, plot = FALSE)
 metadatos
 ```
 
+## Gráfico de cajas
+
+- Gráfico básico:
+
+```r
+hist(employees$salary)
+```
+
+- Para ver los límites de las cajas (cuartiles, mediana y media) podemos usar `summary(employees$salary)`
+- Gráfico en el que se muestra una **variable en función de la división por otra variable**
+
+```r
+# Se muestra el salario en funcion del genero
+boxplot(salary~gender)
+
+# Ahora doble clasificacion, salario en funcion de genero y posicion
+boxplot(salary~gender*jobcat)
+```
+
+## Diagrama de dispersión
+
+- Diagrama básico:
+
+```r
+# Mostramos en el eje x el salario y en el eje y la edad
+plot(salary, age)
+```
+
+## Gráfico de un modelo ajustado a unos datos, sobre el gráfico de dispersión:
+
+- Lo ejemplificamos para las variables `age` y `salary`:
+
+```r
+# Generamos el modelo
+mod<-lm(salary~age)
+
+# Pintamos la linea del modelo sobre el scatter plot
+plot(age, salary)
+abline(mod, col="blue")
+```
+
+## Tablas de frecuencias de variables categóricas
+
+- **Frecuencias absolutas**
+
+```r
+tab <- table(jobcat)
+tab
+```
+
+- **Frecuencias relativas**
+    - Notar que necesitamos haber calculado las frecuencias absolutas
+
+```r
+# Dependemos de `tab`, que son las frecuencias absolutas
+tab.fi <- prop.table(tab)
+tab.fi
+```
+
+- Con esto, podemos construir una **tabla clásica de frecuencias**
+
+```r
+data.frame(tab, Freq.rel = as.numeric(tab.fi))
+```
+
+## Tabla de frecuencias conjuntas de dos variables
+
+- También conocida como **tabla de contingencia**
+- Se empieza construyendo un `table` con las dos variables con las que queremos trabajar
+
+```r
+tab2 <- table(employee$jobcat, employee$gender)
+```
+
+- Añadimos la suma por filas y columnas:
+
+```r
+# Notar que no hacemos `tab2 <- addmargins(tab2)`, porque la funcion ya modifica la tabla para
+# evitar que tengamos que hacer esto
+addmargins(tab2)
+```
+
+### Diagrama de barras
+
+- Dependemos de las tablas de frecuencias que hemos explicado en el apartado anterior
+
+```r
+barplot(tab)
+```
+
+### Diagrama de sectores
+
+- Dependemos de las tablas de frecuencias que hemos explicado en el apartado anterior
+
+```r
+pie(tab)
+```
+
+### Diagrama de barras apiladas
+
+- Dependemos de una tabla de _contingencia_ construida en un apartado anterior, con la suma de los márgenes realizada
+- Las dos variables con las que trabajamos deben ser _factores_ para que se visualice correctamente
+- Con esto ya podemos hacer:
+
+```r
+# `tab2` debe ser una tabla de contingencia a la que se le han sumado en los
+# margenes con `addmargins`
+barplot(tab2)
+```
+
+- Hacemos lo mismo, pero con una **primera mejora gráfica**:
+
+```r
+barplot(
+    tab2,
+    legend.text=TRUE,
+    args.legend = list(x = 'topleft', bty = 'n'),
+    ylim = c(0, 300),
+    density = 30,
+    col = c('green', 'blue', 'red'),
+    main = 'Number of employees by gender and job category'
+)
+```
+
+- Una **segunda mejora gráfica** (es alternativa, no es una mejora que se añada a la primera!):
+
+```r
+barplot(
+    tab2,
+    legend.text = TRUE,
+    args.legend = list(x = 'top', bty = 'n'),
+    density = 30,
+    col = c('green', 'blue', 'red'),
+    main = 'Number of employees by gender and job category',
+    beside = TRUE
+)
+```
+
+--------------------------------------------------------------------------------
+
 # Estudios estadísticos
 
 ## Estudio de la normalidad
 
-- Gráfico probabilístico normal
+- **Gráfico probabilístico normal**
     - Buscamos con este gráfico que los puntos salgan alineados en una recta
     - En cuyo caso, podemos pensar que los datos siguen una distribución normal
 
 ```r
 qqnorm(salary)
 ```
+
+- **Test de hipótesis**:
+    - $H_0$: la variable sigue una distribución normal
+    - $H_1$: la variable no sigue una distribución normal
+    - Buscamos, por tanto, no rechazar la hipótesis nula, luego el $p-value$ debe ser alto
+    - Cuando el $p-value$ es bajo, se rechaza la hipótesis nula, es decir, la variable no sigue una distribución normal
+- **Test Kolgomorov-Smirnov**:
+
+```r
+# Usando el ejemplo del salario
+ks.test(salary, pnorm, mean = mean(salary), sd = sd(salary))
+```
+
+- **Test Saphiro-Wilks**:
+
+```r
+# Usando el ejemplo del salario
+shapiro.test(salary)
+```
+
+- Se pueden usar *boxplots* también para el estudio de la normalidad

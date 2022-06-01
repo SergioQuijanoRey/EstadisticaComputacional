@@ -98,7 +98,7 @@ lines(density(salary),col='blue')
 curve(dnorm(x,mean=mean(salary),sd=sd(salary)),add=TRUE,col='red',lty=2)
 
 # Leyenda explicativa
-legend('topright',c('Función de densidad suavizada','Función de densidad Normal'))
+legend('topright',c('Función de densidad suavizada','Función de densidad Normal'), lty = 1:2)
 ```
 
 No parece que sea un buen modelo de probabilidad para los datos, no se ajusta a la distribución que visualizamos con el histograma.
