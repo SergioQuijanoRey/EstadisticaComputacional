@@ -139,6 +139,17 @@ boxplot(salary~gender*jobcat)
 plot(salary, age)
 ```
 
+- Matriz de gráficos de dispersión, mostrando todos los posibles pares de dispersión de un *dataset*
+    - Sirve para detectar posibles linealidades entre dos variables
+    - Sirve para detectar si hay respuesta lineal de la variable de salida con alguna de las variables de entrada
+
+```r
+# Uso el dataset `hatco` como ejemplo
+# Uso c(6:13) porque en ese dataset, estas son las variables numericas para las
+# que tiene sentido hacer graficos de dispersion
+plot(hatco[,c(6:13)])
+```
+
 ## Gráfico de un modelo ajustado a unos datos, sobre el gráfico de dispersión:
 
 - Lo ejemplificamos para las variables `age` y `salary`:
@@ -286,3 +297,64 @@ shapiro.test(salary)
 ```
 
 - Se pueden usar *boxplots* también para el estudio de la normalidad
+
+--------------------------------------------------------------------------------
+
+# Ajuste de un modelo
+
+- Para realizar un ajuste lineal:
+
+```r
+# Fidelidad en funcion de otras variables de entrada, de forma lineal
+# Usando para el ajuste los datos del dataset `hatco`
+#
+# No hace falta usar `attach`, ya la función sabe que las variables son las que
+# estan en el dataset que pasamos para ajustar los datos
+mod<-lm(
+    fidelidad~velocidad+precio+flexprec+imgfabri+servconj+imgfvent+calidadp,
+    hatco
+)
+
+# Haciendo print del ajuste podemos ver los coeficientes
+mod
+```
+
+## Estudio de la bondad del ajuste realizado
+
+### Estudio con `summary`
+
+- Lo más básico es saber el valor de $R^2$
+    - También nos marca con asteriscos los niveles de significación
+        - $H_0$ significa que $\beta_i = 0$, es decir, que la variable $x_i$ no es relevante en el ajuste
+        - Buscamos que los $p-valores$ que vienen dados por $P(> |t|)$ sean bajos para que así las variables sean relevantes
+    - El valor $F$ indica que todas las variables son inútiles. Buscamos un valor alto de $F$ (ie. 45) para indicar que el ajuste realizado tiene sentido
+    - Un valor de $R^2 = 0.75$ se puede interpretar como que el $75\%$ de la variabilidad total queda explicada por el modelo que hemos ajustado
+    - $R^2$ ajustado intenta corregir que $R^2$ normal se eleva demasiado conforme incluimos variables, aunque estas variables no aporten demasiado
+
+```r
+summary(mod)
+```
+
+### Estudio con la tabla ANOVA
+
+- Se realiza con:
+
+```r
+anova(mod)
+```
+
+- Para **interpretarlo**:
+    - La columna `Sum Sq` en la fila `Residuals` nos da la variabilidad no explicada por el modelo
+    - En las filas anteriores, `Sum Sq` nos da la variabilidad explicada por cada variable explicativa
+
+### Estudio de la significación individual
+
+- Para una variable $x_i$ planteamos $H_0: \beta_i = 0$ la variable no es útil $H_1: \beta_i \neq 0$
+    - Por tanto, buscamos rechazar la hipótesis nula
+    - Por tanto, buscamos $p-valores$ bajos
+- Esto se ve en la tabla `summary`, el $p-value$ viene dado por $P(> |t|)$
+- Además, vienen marcadas con astericos las variables que sí son útiles
+- Realmente no es el p-value. El p-value es $1 - valor$, y queremos que sea un valor alto
+- Para el término constante, nos fijamos en `Intercept`
+
+<!-- TODO -- seguir con diagnostico del modelo, que viene en la pagina 6 -->
