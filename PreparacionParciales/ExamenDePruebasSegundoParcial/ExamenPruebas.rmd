@@ -219,7 +219,7 @@ Con esto, pasamos a generar los 1000 valores de dicha distribución:
 a <- 5
 b <- 4
 n <- 1000
-F_inv <- function(u) b / (1 - u)^(1 / a)
+F_inv <- function(u) (b) / ((1 - u)^(1 / a))
 
 # Tomamos los puntos
 x <- metodo_inversion(n, F_inv)
@@ -246,6 +246,15 @@ curve(f(x), add = TRUE, col = "red")
 ```
 
 Gráficamente podemos ver que la aproximación conseguida es muy buena. Veamos esto con un contraste de Kolmogorov-Smirknow:
+
+```{r}
+# Definimos la funcion de distribucion, que tenemos que usar para el ks.test
+# La funcion tiene que aceptar los valores de a, b para
+F <- function(x, a, b) (1 - (b / x)^a) * (x > b)
+
+# Aplicamos el test
+ks.test(x, F, a = a, b = b)
+```
 
 # Ejercicio 4
 

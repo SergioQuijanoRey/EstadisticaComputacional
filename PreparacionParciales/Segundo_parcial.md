@@ -283,6 +283,7 @@ qqnorm(salary)
 - **Test Kolgomorov-Smirnov**:
     - Sirve para otras distribuciones además de la normal, por eso hay que especificar más parámetros que en el test de Shapiro
     - Siempre hay que usar `p<distribucion>` o la función de densidad de probabilidad $f(x)$ que hayamos programado
+        - Recordar que esta es la función de distribución $F(x)$, por si la tenemos que definir a mano
 
 ```r
 # Usando el ejemplo del salario
@@ -575,6 +576,63 @@ lines(estim + z*estim.err,col='blue',lwd=2,lty=3)
 
 # Aproximación de una integral
 
+## Montecarlo simple
+
+- Integral en un intervalo $(0, 1)$
+- Lo codifico en la siguiente función, para ser reutilizada:
+
+```r
+# Funcion para realizar la aproximacion de una integral en el intervalo 0, 1
+#
+# PARAMETERS
+# ==========
+# `nsim` numero de simulaciones que queremos lanzar
+# `f` funcion que estamos integrando en (0, 1)
+# `seed` semilla aleatoria que queremos usar
+# `show_plot` TRUE si queremos que se muestre el grafico de aproximacion
+#
+# RETURNS
+# =======
+# `approx_int` valor de la aproximacion
+# `error` estimacion del error cometido
+# `approx_seq` secuencia de valores de aproximaciones a la integral
+montecarlo_simple <- function(nsim = 1000, f, seed = 1, show_plot = FALSE) {
+    # Fijamos la semilla aleatoria
+    set.seed(1)
+
+    # Muestreamos de una uniforme 0, 1 y aplicamos la funcion sobre esa muestra
+    x <- runif(n = nsim, min = 0, max = 1)
+    fx <- f(x)
+
+    # Realizamos la aproximacion usando los valores previamente calculados
+    # En vez de guardar el valor final de la aproximacion, guardamos la secuencia de aproximaciones
+    # para poder mostrar graficos de convergencai
+    approx_int_seq <- cumsum(fx) / (1:nsim)
+
+    # Calculamos los errores en la aproximacion
+    error <- sqrt(cumsum((fx - approx_int_seq)^2)) / (1:nsim)
+
+    # Mostramos graficamente los errores si asi se ha dado por parametro
+    if(show_plot == TRUE) {
+        plot(
+            1:nsim,
+            approx_int_seq,
+            type = "l",
+            ylab = "Aproximación y límites de error",
+            xlab = "Número de simulaciones"
+        )
+        z <- qnorm(0.025, lower.tail = FALSE)
+        lines(approx_int_seq - z * error, col = "blue", lwd = 2, lty = 3)
+        lines(approx_int_seq + z * error, col ="blue", lwd = 2, lty = 3)
+        abline(h = approx_int_seq[nsim], col = 2)
+    }
+
+    # Devolvemos los datos, esto es, la aproximacion final, el error de la
+    # aproximacion y toda la secuencia
+    return(list(approx_int = approx_int_seq[nsim], error = error[nsim], approx_seq = approx_int_seq))
+}
+```
+
 ## Montecarlo en un intervalo $(a, b)$
 
 - Lo coloco en una función para que sea fácil de aplicar
@@ -736,9 +794,17 @@ curve(f(x), add = TRUE, col = "red")
 
 - Se puede comprobar que la simulacion es buena con el *test de Kolgomorov-Smirnov*:
     - De nuevo, recordar que hay que usar `p<distribucion>` o la función de densidad de probabilidad $f(x)$ que hayamos programado
+        - Recordar que esta es la función de distribución $F(x)$, por si la tenemos que definir a mano
     - Buscamos, para aceptar que la simulación es buena, un valor alto del p-valor
+- En este ejemplo, uso una $F(x)$ propia y no una `p<distribucion> para ilustrarlo`
 
 ```r
-# TODO -- completar bien
-ks.test(x,pexp,rate=lambda)
+# Defino la funcion de distribucion, que debe aceptar los parametros a, b ademas de x
+F <- function(x, a, b) (1 - (b / x)^a) * (x > b)
+
+# Aplicamos el test
+# Notar que los parametros a, b los paso despues, porque estan fijados
+a <- 5
+b <- 4
+ks.test(x, F, a = a, b = b)
 ```
