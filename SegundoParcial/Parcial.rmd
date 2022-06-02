@@ -101,6 +101,12 @@ metodo_inversion <- function(n, F_inv) {
 }
 ```
 
+Antes de simular nada, fijo una semilla aleatoria, para que los resultados sean reproducibles y fijos:
+
+```{r}
+set.seed(1)
+```
+
 Ahora, uso esta función para simular los `n = 1000` valores de la distribución:
 
 ```{r}
@@ -138,9 +144,11 @@ A simple vista parece que la simulación es buena, pues la curva de densidad a p
 
 ```{r}
 # Definimos la funcion de distribucion, que tenemos que usar para el ks.test
-# La funcion tiene que aceptar los valores de a, b para
-F <- function(x, a, b) (1 - (b / x)^a) * (x > b)
+# La funcion tiene que aceptar los valores de a, b para pasarlos como parametros en ks.test
+F <- function(x, a, b) (1 - (b / x)^a) * (x >= b)
 
 # Aplicamos el test
 ks.test(x, F, a = a, b = b)
 ```
+
+El $p-value$ obtenido es de $0.5928$, muy alto, por lo tanto no rechazamos la hipótesis nula y concluimos que la simulación realizada es satisfactoria.
