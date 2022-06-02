@@ -87,7 +87,7 @@ Uso el código del examen de pruebas que ya tenía preparado en mi [repositorio 
 ```{r}
 # Funcion que devuelve el
 # `n` numero de valores que queremos generar de la distribucion
-# `F_inv` función de densidad inversa
+# `F_inv` inversa de la función de distribucion
 metodo_inversion <- function(n, F_inv) {
 
     # Generamos n valores de una uniforme 0, 1
@@ -123,20 +123,20 @@ x <- metodo_inversion(n, F_inv)
 Mostramos los puntos obtenidos en un histograma:
 
 ```{r}
-hist(x)
+hist(x, main = "Metodo de inversion para la distribucion de Pareto")
 ```
 
 Veamos ahora que los datos se asimilan a tomar la distribución como tal. Empezamos comparando la función de densidad que nos da el histograma con la función de densidad real:
 
 ```{r}
 # Empezamos con el histograma
-hist(x, prob = TRUE)
+hist(x, prob = TRUE, main = "Metodo de inversion para la distribucion de Pareto")
 
 # Añadimos las lineas suavizadas que vienen del histograma
 lines(density(x), col = "blue")
 
 # Ahora añadimos la linea de densidad real de la distribucion
-f <- function(x) (a*b^a) / (x^(a+1))
+f <- function(x) (a*b^a) / (x^(a+1)) * (x >= b)
 curve(f(x), add = TRUE, col = "red")
 ```
 
@@ -151,4 +151,4 @@ F <- function(x, a, b) (1 - (b / x)^a) * (x >= b)
 ks.test(x, F, a = a, b = b)
 ```
 
-El $p-value$ obtenido es de $0.5928$, muy alto, por lo tanto no rechazamos la hipótesis nula y concluimos que la simulación realizada es satisfactoria.
+El $p-value$ obtenido es de $0.5928$, muy alto, por lo tanto no rechazamos la hipótesis nula y concluimos que la simulación realizada es satisfactoria. La hipótesis nula consiste en asumir que los datos $x$ se obtienen de un muestreo de una distribución de Pareto de parámetros $a = 5, b = 4$.
