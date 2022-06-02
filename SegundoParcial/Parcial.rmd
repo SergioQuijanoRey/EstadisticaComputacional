@@ -21,15 +21,17 @@ Cargamos el *dataframe*:
 dataset <- airquality
 ```
 
-Veo las primero cinco filas del *dataframe* para observar su estructura:
+Veo las primero cinco filas del *dataframe* para observar su estructura y más o menos el rango que toman cada una de las variables:
 
 ```{r}
 head(dataset, 5)
 ```
 
+Podría hacer `attach(dataset)` para evitar cosas como `dataset$Solar.R`, pero todos los códigos que tengo preparados de las prácticas de la asignatura usan `dataset` como nombre.
+
 ## Diagrama de cajas de la radiación solar en función de los meses
 
-Un ejercicio muy parecido lo hicimos en la práctica 7, así que tomo ese código y lo adapto.
+Un ejercicio muy parecido lo hicimos en la práctica 7, así que tomo ese código y lo adapto (tengo todos los códigos en mi [repositorio de github](https://github.com/SergioQuijanoRey/EstadisticaComputacional).
 
 Empiezo haciendo que los meses sean un factor para que se visualicen bien los nombres en la gráfica:
 
@@ -120,7 +122,7 @@ F_inv <- function(u) (b) / ((1 - u) ^ (1 / a))
 x <- metodo_inversion(n, F_inv)
 ```
 
-Mostramos los puntos obtenidos en un histograma:
+Mostramos los datos obtenidos en un histograma:
 
 ```{r}
 hist(x, main = "Metodo de inversion para la distribucion de Pareto")
