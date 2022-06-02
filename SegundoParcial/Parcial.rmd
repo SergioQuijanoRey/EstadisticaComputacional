@@ -80,3 +80,67 @@ abline(mod, col="blue")
 ```
 
 # Ejercicio 2
+
+Uso el código del examen de pruebas que ya tenía preparado en mi [repositorio de github](https://github.com/SergioQuijanoRey/EstadisticaComputacional). En primer lugar, tomo la función del método de inversión que ya tenía preparada:
+
+
+```{r}
+# Funcion que devuelve el
+# `n` numero de valores que queremos generar de la distribucion
+# `F_inv` función de densidad inversa
+metodo_inversion <- function(n, F_inv) {
+
+    # Generamos n valores de una uniforme 0, 1
+    U <- runif(n = n, min = 0, max = 1)
+
+    # Usamos la función inversa para generar el muestreo simulado
+    X <- F_inv(U)
+
+    # Devolvemos dichos valores
+    return(X)
+}
+```
+
+Ahora, uso esta función para simular los `n = 1000` valores de la distribución:
+
+```{r}
+# Parametros de la simulacion
+a <- 5
+b <- 4
+n <- 1000
+F_inv <- function(u) (b) / ((1 - u) ^ (1 / a))
+
+# Tomamos los puntos
+x <- metodo_inversion(n, F_inv)
+```
+
+Mostramos los puntos obtenidos en un histograma:
+
+```{r}
+hist(x)
+```
+
+Veamos ahora que los datos se asimilan a tomar la distribución como tal. Empezamos comparando la función de densidad que nos da el histograma con la función de densidad real:
+
+```{r}
+# Empezamos con el histograma
+hist(x, prob = TRUE)
+
+# Añadimos las lineas suavizadas que vienen del histograma
+lines(density(x), col = "blue")
+
+# Ahora añadimos la linea de densidad real de la distribucion
+f <- function(x) (a*b^a) / (x^(a+1))
+curve(f(x), add = TRUE, col = "red")
+```
+
+A simple vista parece que la simulación es buena, pues la curva de densidad a partir de los datos y la curva de densidad real son muy parecidas. Confirmamos esto con un contraste de Kolmogorov-Smirknow:
+
+```{r}
+# Definimos la funcion de distribucion, que tenemos que usar para el ks.test
+# La funcion tiene que aceptar los valores de a, b para
+F <- function(x, a, b) (1 - (b / x)^a) * (x > b)
+
+# Aplicamos el test
+ks.test(x, F, a = a, b = b)
+```
