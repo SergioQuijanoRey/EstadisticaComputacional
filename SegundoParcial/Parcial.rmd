@@ -1,0 +1,82 @@
+---
+title: Segundo Parcial Estadística Computacional
+author:
+    - Sergio Quijano Rey
+    - sergioquijano@correo.ugr.es
+date:
+output:
+    html_document:
+        toc: true
+        toc_depth: 3
+        toc_float: false
+        collapsed: true
+        number_sections: true
+---
+
+# Primer Ejercicio
+
+Cargamos el *dataframe*:
+
+```{r}
+dataset <- airquality
+```
+
+Veo las primero cinco filas del *dataframe* para observar su estructura:
+
+```{r}
+head(dataset, 5)
+```
+
+## Diagrama de cajas de la radiación solar en función de los meses
+
+Un ejercicio muy parecido lo hicimos en la práctica 7, así que tomo ese código y lo adapto.
+
+Empiezo haciendo que los meses sean un factor para que se visualicen bien los nombres en la gráfica:
+
+```{r}
+dataset <- within(dataset, {
+    # Uso month.name para obtener los meses del año
+    # Solo hay meses del 5 al 9, asi que solo me quedo con esos nombres
+    Month <- factor(Month, labels = month.name[5:9])
+})
+```
+
+Con esto, ya puedo hacer el gráfico que se me pide:
+
+```{r}
+boxplot(dataset$Solar.R ~ dataset$Month, xlab = "Mes", ylab = "Radiacion Solar")
+```
+
+## Diagrama de dispersión entre radiación solar y concentración de ozono
+
+```{r}
+plot(
+    dataset$Solar.R,
+    dataset$Ozone,
+    xlab = "Radiacion solar",
+    ylab = "Concentracion Ozono"
+
+)
+```
+
+## Ajuste de una recta y visualización gráfica
+
+```{r}
+# Generamos el modelo
+# Ozone = \beta_0 + \beta_1 Solar.R
+mod<-lm(dataset$Ozone ~ dataset$Solar.R)
+
+# Hago el mismo plot que en el ejercicio anterior
+plot(
+    dataset$Solar.R,
+    dataset$Ozone,
+    xlab = "Radiacion solar",
+    ylab = "Concentracion Ozono"
+
+)
+
+# Y a ese plot le añado la recta que acabamos de ajustar
+abline(mod, col="blue")
+```
+
+# Ejercicio 2
